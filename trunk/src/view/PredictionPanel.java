@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.util.Scanner;
 import java.io.*;
 
-public class PredictionPanel extends JFrame implements ActionListener {
+public class PredictionPanel extends JFrame implements ActionListener{
 	private TextArea textArea = new TextArea("", 0,0, TextArea.SCROLLBARS_VERTICAL_ONLY);
 	public TextArea getTextArea() {
 		return textArea;
@@ -33,12 +33,13 @@ public class PredictionPanel extends JFrame implements ActionListener {
 	
 	private PredictionPanel() {
 		this.setSize(700, 450); // set the initial size of the window
-		this.setTitle("Java Notepad Tutorial"); // set the title of the window
+		this.setTitle("Word Prediction"); // set the title of the window
 		setDefaultCloseOperation(EXIT_ON_CLOSE); // set the default close operation (exit when it gets closed)
 		this.textArea.setFont(new Font("Century Gothic", Font.BOLD, 12)); // set a default font for the TextArea
 		this.textArea.setColumns(20);
 		this.textArea.setRows(5);
 		
+		this.setMinimumSize(new Dimension(1000, 450));
 		predictionPanel.setBackground(new java.awt.Color(204, 204, 204));
 		predictionPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		 javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(predictionPanel);
@@ -76,7 +77,7 @@ public class PredictionPanel extends JFrame implements ActionListener {
 	    mPanel.add(textArea);
 	    mPanel.add(predictionPanel);
 //	    mainPanel.setLayout(new BorderLayout());
-	    
+	    textArea.addKeyListener(new MyTextListener());
 	        pack();
 
 		// this is why we didn't have to worry about the size of the TextArea!
