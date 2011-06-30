@@ -11,14 +11,19 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import controller.Probak;
+
 public class MyTextListener implements KeyListener {
 			String source;
-			boolean separator;
+			boolean first;
 			PopUp popup;
 			private static java.util.List<Character> separators =  java.util.Arrays.<Character>asList(',',';','.',' ');
 
 			public MyTextListener() {
-
+				first = true;
+			}
+			private String findWord(char c){
+				return Probak.getWords().get(c).get(1).getLemma();
 			}
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -33,20 +38,22 @@ public class MyTextListener implements KeyListener {
 			@Override
 			public void keyTyped(KeyEvent k) {
 				char c = k.getKeyChar();
-				if(popup!=null)
-					popup.setVisible(false);
-				if(separators.contains(c))
+				String word;
+				if(first){
+					first = false;
+					word = findWord(c);
 					if(popup == null)
-						popup = new PopUp("Separator!");
+						popup = new PopUp(word);
 					else{
-						popup.getLabel().setText("Separator!");
+						popup.getLabel().setText(word);
 						popup.setVisible(true);
 					}
+				}
+				
+				if(separators.contains(c)){
+					
+					first =true;
+				}
 			}
-			public boolean isSeparator() {
-				return separator;
-			}
-			public void setSeparator(boolean separator) {
-				this.separator = separator;
-			}
+			
 }
