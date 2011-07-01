@@ -11,19 +11,29 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import utilities.Trie;
+
 import controller.Probak;
 
 public class MyTextListener implements KeyListener {
-			String source;
+			String word;
 			boolean first;
 			PopUp popup;
+			Trie words;
 			private static java.util.List<Character> separators =  java.util.Arrays.<Character>asList(',',';','.',' ');
 
 			public MyTextListener() {
 				first = true;
+				word = "";
 			}
-			private String findWord(char c){
-				return Probak.getWords().get(c).get(1).getLemma();
+			private String findWord(String word){
+				String result = "";
+				words = Probak.getWords();
+				List<String> retrieved = words.search(word);
+				for (String ret:retrieved){
+					result += ret +", ";
+				}
+				return result;//(String)retrieved.get(0);
 			}
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -38,17 +48,19 @@ public class MyTextListener implements KeyListener {
 			@Override
 			public void keyTyped(KeyEvent k) {
 				char c = k.getKeyChar();
-				String word;
-				if(first){
+				word += c;
+				String predicted = "";
+//				if(first){
 					first = false;
-					word = findWord(c);
-					if(popup == null)
-						popup = new PopUp(word);
-					else{
-						popup.getLabel().setText(word);
-						popup.setVisible(true);
-					}
-				}
+					predicted = findWord(word);
+					PredictionPanel.getMainPanel().getWarning().setText(predicted);
+//					if(popup == null)
+//						popup = new PopUp(predicted);
+//					else{
+//						popup.getLabel().setText(predicted);
+//						popup.setVisible(true);
+//					}
+//				}
 				
 				if(separators.contains(c)){
 					

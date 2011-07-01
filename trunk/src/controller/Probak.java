@@ -6,15 +6,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+
+import ds.tree.RadixTree;
 
 import model.JDBCWrapper;
 
+import utilities.MyTrie;
 import view.PredictionPanel;
 
 
 public class Probak {
 	private static JDBCWrapper connection;
-	private static HashMap<Character,ArrayList<Word>> words;
+	private static MyTrie<String> words;//HashMap<Character,ArrayList<String>> words;
 	public class Word{
 		private int id;
 		private String lemma;
@@ -53,8 +57,8 @@ public class Probak {
 		 int id;
 		 String lemma;
 		 char firstC;
-		 Word word;
-		 words = new HashMap<Character,ArrayList<Word>>();
+//		 Word word;
+		 words = new MyTrie<String>();//new HashMap<Character,ArrayList<String>>//new HashMap<Character,ArrayList<String>>();
 			String sql = "select * from words ";
 //				log.debug("execute:" + sql);
 			// Executing
@@ -68,43 +72,60 @@ public class Probak {
 				while (connection.next()){
 					id =connection.getInt("wordid");
 					lemma =connection.getString("lemma");
-					firstC = lemma.charAt(0);
-					word = tries.new Word(id, lemma);
-					if(words.containsKey(firstC)){
-						words.get(firstC).add(word);
-					}
-					else{
-						ArrayList<Word> arrayList = new ArrayList<Word>();
-						arrayList.add(word);
-						words.put(new Character(firstC), arrayList);
-					}
+//					firstC = lemma.charAt(0);
+//					word = tries.new Word(id, lemma);
+//					if(words.containsKey(firstC)){
+//						words.get(firstC).add(lemma);
+//					}
+//					else{
+//						ArrayList<String> arrayList = new ArrayList<String>();
+//						arrayList.add(lemma);
+//						words.put(new Character(firstC), arrayList);
+//					}
+					words.add(lemma, lemma);
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			finally{
-//				System.err.println();
+				System.err.println();
+				List<String> list =words.search("aba");
+				for(String w:list){
+					System.err.println(w);
+				}
 //				Iterator<Character> i = words.keySet().iterator();
 //				Character c;
-//				ArrayList<Word> _words;
+//				ArrayList<String> _words;
+//				int count = 0;
 //				for(;i.hasNext();){
 //					c = i.next();
 //					System.err.println("************************************************");
 //					System.err.println("letter::"+c);
 //					System.err.println("************************************************");
 //					_words = words.get(c);
-//					for(int j=0;j<_words.size();j++)
-//						System.err.print(_words.get(j).getLemma()+"::");
+//					for(int j=0;j<_words.size();j++){
+//						String w = _words.get(j);
+//						System.err.print(w+"::");
+//						if (!w.contains(" ")  && w.length()>12)
+//							count ++;
+//					}
 //					System.err.println();
 //					System.err.println("************************************************");
 //				}
+//				System.err.println("**********************************words bigger than 12::"+count+"********************************************");
 			}
 	    }
-	public static HashMap<Character, ArrayList<Word>> getWords() {
+//	public static HashMap<Character, ArrayList<String>> getWords() {
+//		return words;
+//	}
+//	public static void setWords(HashMap<Character, ArrayList<String>> words) {
+//		Probak.words = words;
+//	}
+	public static MyTrie<String> getWords() {
 		return words;
 	}
-	public static void setWords(HashMap<Character, ArrayList<Word>> words) {
+	public static void setWords(MyTrie<String> words) {
 		Probak.words = words;
 	}
 	 
