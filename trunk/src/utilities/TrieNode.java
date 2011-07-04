@@ -1,9 +1,13 @@
 package utilities;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.tree.TreeNode;
+
 public class TrieNode<T> {
+	Collection<TrieNode<T>> childNodes;
 	private Character nodeKey;
 	private T nodeValue;
 	private boolean terminal;
@@ -39,5 +43,9 @@ public class TrieNode<T> {
 
 	public void setChildren(Map<Character, TrieNode<T>> children) {
 		this.children = children;
+	}
+
+	public Collection<TrieNode<T>> getChildNodes() {
+		return children.values();
 	}
 }

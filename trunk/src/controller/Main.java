@@ -18,11 +18,14 @@ import utilities.MyTrie;
 import view.PredictionPanel;
 
 
-public class Probak {
+public class Main {
 	private static JDBCWrapper connection;
+	public static final String WORD_ENDS = "[\\s,.;]";
 	private MyTrie<String> words;//HashMap<Character,ArrayList<String>> words;
 	private Set<String> valueSet;
 	private static String[] strArry;
+//	static long start,end;
+	
 	
 	public class Word{
 		private int id;
@@ -46,19 +49,20 @@ public class Probak {
 		}
 		
 	}
-	public Probak(){
-		PredictionPanel app = PredictionPanel.getMainPanel();
+	public Main(){
+//		start = System.currentTimeMillis();
 		try {
 			connection = JDBCWrapper.getConnectionInstance();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+	
 		
 	}
 	 public static void main(String args[]) {
-		 Probak proba = new Probak();
+		 Main proba = new Main();
 		 int id;
 		 String lemma;
 		 char firstC;
@@ -99,47 +103,15 @@ public class Probak {
 				if(!proba.valueSet.isEmpty()){
 					strArry = new String[proba.valueSet.size()];
 					proba.valueSet.toArray(strArry);
+//					System.err.println("Completed database part");
+//					end = System.currentTimeMillis();
+//					System.err.println("time::" + (end - start));
+					PredictionPanel app = PredictionPanel.getMainPanel();
 				}
-//				System.err.println();
-//				List<String> list =words.search("aba");
-//				for(String w:list){
-//					System.err.println(w);
-//				}
-//				Iterator<Character> i = words.keySet().iterator();
-//				Character c;
-//				ArrayList<String> _words;
-//				int count = 0;
-//				for(;i.hasNext();){
-//					c = i.next();
-//					System.err.println("************************************************");
-//					System.err.println("letter::"+c);
-//					System.err.println("************************************************");
-//					_words = words.get(c);
-//					for(int j=0;j<_words.size();j++){
-//						String w = _words.get(j);
-//						System.err.print(w+"::");
-//						if (!w.contains(" ")  && w.length()>12)
-//							count ++;
-//					}
-//					System.err.println();
-//					System.err.println("************************************************");
-//				}
-//				System.err.println("**********************************words bigger than 12::"+count+"********************************************");
+
 			}
 	    }
-//	public static HashMap<Character, ArrayList<String>> getWords() {
-//		return words;
-//	}
-//	public static void setWords(HashMap<Character, ArrayList<String>> words) {
-//		Probak.words = words;
-//	}
-//	public static MyTrie<String> getWords() {
-//		return words;
-//	}
-//	public static void setWords(MyTrie<String> words) {
-//		Probak.words = words;
-//	}
-	
+
 	public static String[] getStrArry() {
 		return strArry;
 	}

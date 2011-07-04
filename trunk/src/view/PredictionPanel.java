@@ -1,17 +1,21 @@
 package view;
 import javax.swing.*;
+
+import controller.AutoCompleter;
+import controller.MyTextListener;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Scanner;
 import java.io.*;
 
 public class PredictionPanel extends JFrame implements ActionListener{
-	private TextArea textArea = new TextArea("", 0,0, TextArea.SCROLLBARS_VERTICAL_ONLY);
-	public TextArea getTextArea() {
+	private JTextArea textArea = new JTextArea("", 0,0);
+	public JTextArea getTextArea() {
 		return textArea;
 	}
 
-	public void setTextArea(TextArea textArea) {
+	public void setTextArea(JTextArea textArea) {
 		this.textArea = textArea;
 	}
 	private JPanel predictionPanel = new JPanel();
@@ -26,8 +30,11 @@ public class PredictionPanel extends JFrame implements ActionListener{
 	
 	public static PredictionPanel mainPanel;
 	public static PredictionPanel getMainPanel(){
+		
 		if(mainPanel == null)
 			mainPanel = new PredictionPanel();
+		AutoCompleter ac = new AutoCompleter(mainPanel.textArea);
+		
 		mainPanel.setVisible(true);
 		return mainPanel;
 	}
@@ -43,17 +50,6 @@ public class PredictionPanel extends JFrame implements ActionListener{
 		this.setMinimumSize(new Dimension(1000, 450));
 		predictionPanel.setBackground(new java.awt.Color(204, 204, 204));
 		predictionPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-//		 javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(predictionPanel);
-//	        predictionPanel.setLayout(jPanel2Layout);
-//	        jPanel2Layout.setHorizontalGroup(
-//	            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//	            .addGap(0, 673, Short.MAX_VALUE)
-//	        );
-//	        jPanel2Layout.setVerticalGroup(
-//	            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//	            .addGap(0, 105, Short.MAX_VALUE)
-//	        );
-
 	        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(mPanel);
 	        mPanel.setLayout(layout);
 	        layout.setHorizontalGroup(
@@ -75,53 +71,12 @@ public class PredictionPanel extends JFrame implements ActionListener{
 	                .addGap(21, 21, 21))
 	        );
 
-//	        predictionTable = new JTable();
-//	        JScrollPane jScrollPane1 = new JScrollPane();
-//	        predictionTable.setModel(new javax.swing.table.DefaultTableModel(
-//	            new Object [][] {
-//	                {null},
-//	                {null},
-//	                {null},
-//	                {null}
-//	            },
-//	            new String [] {
-//	                "Prediction"
-//	            }
-//	        ));
-//	        jScrollPane1.setViewportView(predictionTable);
-//
-//	        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(predictionPanel);
-//	        predictionPanel.setLayout(jPanel1Layout);
-//	        jPanel1Layout.setHorizontalGroup(
-//	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//	            .addGap(0, 399, Short.MAX_VALUE)
-//	            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//	                .addGroup(jPanel1Layout.createSequentialGroup()
-//	                    .addContainerGap()
-//	                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-//	                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-//	        );
-//	        jPanel1Layout.setVerticalGroup(
-//	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//	            .addGap(0, 220, Short.MAX_VALUE)
-//	            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-//	                .addGroup(jPanel1Layout.createSequentialGroup()
-//	                    .addContainerGap()
-//	                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-//	                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-//	        );
 
-
-	        
 	    warning = new JLabel("messages",JLabel.LEFT);
-//	    warning.setOpaque(true);
-//	    warning.setVisible(true);
-//	    warning.setBackground(Color.red);
 	    mPanel.add(textArea);
 	    mPanel.add(predictionPanel);
 	    predictionPanel.add(warning);
-//	    mainPanel.setLayout(new BorderLayout());
-	    textArea.addKeyListener(new MyTextListener());
+	   
 	        pack();
 
 		// this is why we didn't have to worry about the size of the TextArea!

@@ -1,6 +1,7 @@
 package utilities;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -57,12 +58,11 @@ public class MyTrie<T> implements Trie<T> {
 			valueList.add(currNode.getNodeValue());
 		}
 
-		Map<Character, TrieNode<T>> children = currNode.getChildren();
-		Iterator childIter = children.keySet().iterator();
-		while (childIter.hasNext()) {
-			Character ch = (Character)childIter.next();
-			TrieNode<T> nextNode = children.get(ch);
-			getValuesFromNode(nextNode, valueList);
+		Collection<TrieNode<T>> children = currNode.getChildNodes();
+		if( children != null ){
+			for( TrieNode<T> childNode : children){
+				getValuesFromNode( childNode, valueList);
+			}
 		}
 	}
 
