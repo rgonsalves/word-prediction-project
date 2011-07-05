@@ -3,6 +3,7 @@ package controller;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -27,6 +28,7 @@ public abstract class CompletionPopUp {
 	protected JTextComponent textComp; 
 	private static final String COMPLETION = "COMPLETION"; //NOI18N 
 	private boolean added;
+	private char lastKey;
 	public CompletionPopUp(JTextComponent comp){
 	        textComp = comp; 
 	        added = false;
@@ -45,6 +47,7 @@ public abstract class CompletionPopUp {
 	            textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), JComponent.WHEN_FOCUSED); 
 	            if(!added){
 	            	textComp.getDocument().addDocumentListener(documentListener);
+	            	textComp.addKeyListener(keyListener);
 	            	added = true;
 	            }
 	        }else 
@@ -64,7 +67,9 @@ public abstract class CompletionPopUp {
 	            public void popupMenuCanceled(PopupMenuEvent e){ 
 	            } 
 	        }); 
-	        list.setRequestFocusEnabled(false); 
+	        list.setRequestFocusEnabled(false);
+	        
+	        
 	    }
 
     static Action acceptAction = new AbstractAction(){ 
@@ -87,12 +92,31 @@ public abstract class CompletionPopUp {
  
         public void changedUpdate(DocumentEvent e){} 
     }; 
- 
+   KeyListener keyListener =new KeyListener() {
+		
+		@Override
+		public void keyTyped(KeyEvent e) {
+			lastKey = e.getKeyChar();
+		}
+		
+		@Override
+		public void keyReleased(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
     private void showPopup(){ 
         popup.setVisible(false); 
         if(updateListData() && list.getModel().getSize()!=0){ 
             if(!(textComp instanceof JTextField) && !added){
                 textComp.getDocument().addDocumentListener(documentListener);
+                textComp.addKeyListener(keyListener);
                 added = true;
             }
             textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED); 
@@ -177,5 +201,13 @@ public abstract class CompletionPopUp {
     protected abstract boolean updateListData(); 
  
     // user has selected some item in the list. update textfield accordingly... 
-    protected abstract void acceptedListItem(String selected); 
+    protected abstract void acceptedListItem(String selected);
+
+	public char getLastKey() {
+		return lastKey;
+	}
+
+	public void setLastKey(char lastKey) {
+		this.lastKey = lastKey;
+	} 
 }

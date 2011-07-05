@@ -18,8 +18,8 @@ public class AutoCompleter extends CompletionPopUp{
 	public static final int NUMBER_OF_CHARACTERS_CHECKED = 1; 
 	private int wordBegin;
 	private int wordEnd;
-	private int posX;
-	private static final Pattern p = Pattern.compile(Main.WORD_ENDS);// this will check if any word terminatio character, ",.; " exists in the input text
+	private int cursorPos;
+	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
     public AutoCompleter(JTextComponent comp){ 
         super(comp);
     } 
@@ -30,18 +30,25 @@ public class AutoCompleter extends CompletionPopUp{
      * @return the last word
      */
     private String findCursorWord(String text){
-    	posX =textComp.getCaret().getDot();
-    	Matcher m = p.matcher(text.substring(0, posX));
+    	cursorPos =textComp.getCaret().getDot();
+    	if(text.length() < cursorPos) //if the user is removing characters
+    		cursorPos = text.length();
+    	Matcher m = wordSeparatorPattern.matcher(text.substring(0, cursorPos));
     	Pattern _p = Pattern.compile("\\b"); //word boundary matching
     	wordBegin = 0;
     	 while(m.find()){
     		 wordBegin = m.end();
-    	 }
-    	String word = text.substring(wordBegin, posX + 1).toLowerCase();
-//    	m = _p.matcher(text.substring(posX));
-//    	while (m.find())
-//    		wordEnd = posX + m.end();
-     	return word;
+     	 }
+    	 String prefix = "";
+    	 int wordE = cursorPos + 1;
+    	 if(wordE > text.length())
+    		 wordE = text.length(); 
+    	prefix = text.substring(wordBegin, wordE).toLowerCase();
+    	m = wordSeparatorPattern.matcher(text.substring(cursorPos,text.length()));
+    	wordEnd = text.length();
+    	if (m.find())
+    		wordEnd = cursorPos + m.end();
+     	return prefix;
     }
     
     /***
@@ -71,21 +78,25 @@ public class AutoCompleter extends CompletionPopUp{
 		}
 		return retrieved;
 	}
-	
+	/****
+	 * This procedure will update the data in the popup, filling List list with the data that's to show in the popup.
+	 * It will return true if the popup is shown, false otherwise.
+	 */
     protected boolean updateListData(){ 
-        String value = textComp.getText();
+        String allText = textComp.getText();
        
         String word[];
-        if(value == ""){
+        if(allText.length() == 0){
         	System.err.println("value length eq 0");
         	return false;
         }
       
-        String lastKey = value.substring(value.length() - NUMBER_OF_CHARACTERS_CHECKED);
-        Matcher m = p.matcher(lastKey);
+        String lastKey = "" + getLastKey();//value.substring(cursorPos + 1, cursorPos + 1 +NUMBER_OF_CHARACTERS_CHECKED);
+        Matcher m = wordSeparatorPattern.matcher(lastKey);
+        
         String prefix = "";
         if(!m.find()){//if last character input is not a space
-        	    prefix = findCursorWord(value);
+        	    prefix = findCursorWord(allText);
 		        if(prefix.length() == 0){
 		        	System.err.println("prefix length eq 0");
 		        	return false;
@@ -104,8 +115,8 @@ public class AutoCompleter extends CompletionPopUp{
             return;
         
         try{
-//        	textComp.getDocument().remove(posX, wordEnd);
-            textComp.getDocument().insertString(textComp.getCaretPosition(), selected, null); 
+        	textComp.getDocument().remove(wordBegin, wordEnd - wordBegin);
+            textComp.getDocument().insertString(wordBegin, selected +" ", null); 
         } catch(BadLocationException e){ 
             e.printStackTrace(); 
         } 
