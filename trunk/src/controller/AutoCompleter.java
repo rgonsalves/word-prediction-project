@@ -117,7 +117,7 @@ public class AutoCompleter extends CompletionPopUp{
             return;
         String lineStr = pressedKey.replaceAll("F", "");
         int line = Integer.parseInt(lineStr) -1 ;
-        if(list.getModel().getSize() < line){
+        if(list.getModel().getSize() >= line){
         	String _selected = (String) list.getModel().getElementAt(line);
         	selectedWord = _selected.split("\\.\\.\\.")[1];
         	try{
