@@ -13,16 +13,16 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 
-import utilities.Trie;
-import view.PopUp;
+//import utilities.Trie;
+//import view.PopUp;
 import view.PredictionPanel;
 
 
 public class MyTextListener implements KeyListener {
 			String word;
 			boolean first;
-			PopUp popup;
-			Trie words;
+//			PopUp popup;
+//			Trie words;
 		
 			
 

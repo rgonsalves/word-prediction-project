@@ -19,6 +19,7 @@ public class AutoCompleter extends CompletionPopUp{
 	private int wordBegin;
 	private int wordEnd;
 	private int cursorPos;
+	private String selectedWord;
 	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
     public AutoCompleter(JTextComponent comp){ 
         super(comp);
@@ -56,16 +57,17 @@ public class AutoCompleter extends CompletionPopUp{
      * @param prefix the prefix
      * @return the words list
      */
-	private String[] findWords(String prefix){
+	private String[] findMatchess(String prefix){
 	    String [] array = Main.getStrArry();
 	    ArrayList<String> list = new ArrayList<String>();
 		String []retrieved;
+		int count = 1;
 		if (array != null && prefix != null){
 			int pos = Arrays.binarySearch(array, prefix);
 			if( pos < 0 ) { pos = -pos - 1;}
-			while (pos >= 0 && pos < array.length) {
+			while (pos >= 0 && pos < array.length && count <13) {
 				if (array[pos].startsWith(prefix)) {
-					list.add(array[pos]);
+					list.add("F"+(count++) +"..."+array[pos]);
 				} else {
 					break;
 				}
@@ -101,7 +103,7 @@ public class AutoCompleter extends CompletionPopUp{
 		        	System.err.println("prefix length eq 0");
 		        	return false;
 		        }
-		        word = findWords(prefix);
+		        word = findMatchess(prefix);
 		        if(word != null && word.length>0){
 		        	list.setListData(word);        	
 		        	return true;
@@ -110,15 +112,20 @@ public class AutoCompleter extends CompletionPopUp{
 	    return false;
     } 
  
-    protected void acceptedListItem(String selected){ 
-        if(selected==null) 
+    protected void acceptedListItem(String pressedKey){ 
+        if(pressedKey==null || pressedKey.length() == 0) 
             return;
-        
-        try{
-        	textComp.getDocument().remove(wordBegin, wordEnd - wordBegin);
-            textComp.getDocument().insertString(wordBegin, selected +" ", null); 
-        } catch(BadLocationException e){ 
-            e.printStackTrace(); 
-        } 
+        String lineStr = pressedKey.replaceAll("F", "");
+        int line = Integer.parseInt(lineStr) -1 ;
+        if(list.getModel().getSize() < line){
+        	String _selected = (String) list.getModel().getElementAt(line);
+        	selectedWord = _selected.split("\\.\\.\\.")[1];
+        	try{
+        		textComp.getDocument().remove(wordBegin, wordEnd - wordBegin);
+        		textComp.getDocument().insertString(wordBegin, selectedWord +" ", null);
+        	} catch(BadLocationException e){ 
+        		e.printStackTrace(); 
+        	} 
+        }
     } 
 }

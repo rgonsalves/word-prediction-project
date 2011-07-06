@@ -1,6 +1,6 @@
 package controller;
 
-import java.io.ObjectInputStream.GetField;
+//import java.io.ObjectInputStream.GetField;
 import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import model.JDBCWrapper;
+
 import ds.tree.RadixTree;
 
-import model.JDBCWrapper;
+//import model.JDBCWrapper;
 
 import utilities.MyTrie;
 import view.PredictionPanel;
