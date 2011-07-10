@@ -31,6 +31,7 @@ public abstract class CompletionPopUp{
 	private static final String COMPLETION = "COMPLETION"; //NOI18N 
 	private boolean added;
 	private char lastKey;
+	private boolean rightKey, leftKey, backKey;
 	public CompletionPopUp(JTextComponent comp){
 	        textComp = comp; 
 	        added = false;
@@ -100,15 +101,16 @@ public abstract class CompletionPopUp{
 		
 		@Override
 		public void keyReleased(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
+			rightKey = e.getKeyCode() == KeyEvent.VK_RIGHT;
+			leftKey = e.getKeyCode() == KeyEvent.VK_LEFT;
+			if (leftKey || rightKey){
+				show(textComp);
+			}
 		}
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
-			if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_RIGHT){
-				show(textComp);
-			}
+			backKey = e.getKeyCode() == KeyEvent.VK_BACK_SPACE;
 		}		
 	};
 	 PopupMenuListener popupListener = new PopupMenuListener(){ 
@@ -232,5 +234,29 @@ public abstract class CompletionPopUp{
 
 	public void setLastKey(char lastKey) {
 		this.lastKey = lastKey;
+	}
+
+	public boolean isLeftKey() {
+		return leftKey;
+	}
+
+	public void setLeftKey(boolean leftKey) {
+		this.leftKey = leftKey;
+	}
+
+	public boolean isRightKey() {
+		return rightKey;
+	}
+
+	public void setRightKey(boolean rightKey) {
+		this.rightKey = rightKey;
+	}
+
+	public boolean isBackKey() {
+		return backKey;
+	}
+
+	public void setBackKey(boolean backKey) {
+		this.backKey = backKey;
 	} 
 }
