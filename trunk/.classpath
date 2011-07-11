@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="C:/Users/Aitor/Dropbox/kent/prediction/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Aitor/Dropbox/kent/prediction/lib/commons-logging-api-1.1.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Aitor/Dropbox/kent/prediction/lib/mysql-connector-java-5.1.16-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Aitor/Dropbox/kent/prediction/lib/RadixTree-0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
