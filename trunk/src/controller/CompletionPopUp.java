@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
+import view.PredictionPanel;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -17,12 +17,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
+import view.PredictionPanel;
 
 public abstract class CompletionPopUp{
 	protected JList list = new JList(); 
@@ -31,7 +40,8 @@ public abstract class CompletionPopUp{
 	private static final String COMPLETION = "COMPLETION"; //NOI18N 
 	private boolean added;
 	private char lastKey;
-	private boolean rightKey, leftKey, backKey;
+	
+    
 	public CompletionPopUp(JTextComponent comp){
 	        textComp = comp; 
 	        added = false;
@@ -50,21 +60,15 @@ public abstract class CompletionPopUp{
 	        if(textComp instanceof JTextArea){ 
 	           
 	            if(!added){
-	            	textComp.getDocument().addDocumentListener(documentListener);
-	            	textComp.addKeyListener(keyListener);
-	            	popup.addPopupMenuListener(popupListener);
+	            	textComp.addCaretListener(caretListener);
+	            	textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), JComponent.WHEN_FOCUSED);
+//	            	textComp.registerKeyboardAction(undoAction, KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
+	            	
 	            	added = true;
 	            }
 	        }
-//	        textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED); 
-	 
-//	        textComp.registerKeyboardAction(upAction, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), JComponent.WHEN_FOCUSED); 
-	        textComp.registerKeyboardAction(hidePopupAction, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW); 
-
-	       
 	        list.setRequestFocusEnabled(false);
-	        
-	        
+	      
 	    }
 
     static Action acceptAction = new AbstractAction(){ 
@@ -76,66 +80,23 @@ public abstract class CompletionPopUp{
         } 
     }; 
  
-    DocumentListener documentListener = new DocumentListener(){ 
-        public void insertUpdate(DocumentEvent e){ 
-            showPopup(); 
-        } 
- 
-        public void removeUpdate(DocumentEvent e){ 
-            showPopup(); 
-        } 
- 
-        public void changedUpdate(DocumentEvent e){} 
-    }; 
-   KeyListener keyListener =new KeyListener() {
+    CaretListener caretListener = new CaretListener() {
 		
 		@Override
-		public void keyTyped(KeyEvent e) {
-			lastKey = e.getKeyChar();
-//			if (e == KeyEvent.VK_LEFT){
-//					show(textComp);
-//			}
-//	            textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), JComponent.WHEN_FOCUSED); 
-//	            textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), JComponent.WHEN_FOCUSED); 
+		public void caretUpdate(CaretEvent e) {
+			
+			show(textComp);
+//			String text = textComp.getText();
+//			if(PredictionPanel.getMainPanel().getSize().getWidth() > textComp.getText().length())
+//				textComp.setText(text + '\n');
 		}
-		
-		@Override
-		public void keyReleased(KeyEvent e) {
-			rightKey = e.getKeyCode() == KeyEvent.VK_RIGHT;
-			leftKey = e.getKeyCode() == KeyEvent.VK_LEFT;
-			if (leftKey || rightKey){
-				show(textComp);
-			}
-		}
-		
-		@Override
-		public void keyPressed(KeyEvent e) {
-			backKey = e.getKeyCode() == KeyEvent.VK_BACK_SPACE;
-		}		
 	};
-	 PopupMenuListener popupListener = new PopupMenuListener(){ 
-         public void popupMenuWillBecomeVisible(PopupMenuEvent e){
- 	     
-         } 
 
-         public void popupMenuWillBecomeInvisible(PopupMenuEvent e){ 
-             textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-         } 
+	
 
-         public void popupMenuCanceled(PopupMenuEvent e){ 
-         } 
-     }; 
     public void showPopup(){ 
         popup.setVisible(false); 
         if(updateListData() && list.getModel().getSize()!=0){ 
-//            if(!(textComp instanceof JTextField) && !added){
-//                textComp.getDocument().addDocumentListener(documentListener);
-//                textComp.addKeyListener(keyListener);
-//                added = true;
-//            }
-//            textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED); 
-//            textComp.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-            
             int size = list.getModel().getSize(); 
             for(int i=0;i<size;i++){//KeyEvent.VK_F1
             	 textComp.registerKeyboardAction(acceptAction, "F" + ( i+1 ), KeyStroke.getKeyStroke(112+i, 0),JComponent.WHEN_FOCUSED);
@@ -154,8 +115,6 @@ public abstract class CompletionPopUp{
             popup.show(textComp, x + 10, y + 13); //popup.show(textComp, 0, 230); 
         }else{
             popup.setVisible(false);
-//	         textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)); 
-//	         textComp.unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)); 
         }
         textComp.requestFocus(); 
     } 
@@ -163,10 +122,7 @@ public abstract class CompletionPopUp{
    private static void show(JComponent tf){
 	   CompletionPopUp completer = (CompletionPopUp)tf.getClientProperty(COMPLETION); 
        if(tf.isEnabled()){ 
-//           if(!completer.popup.isVisible()) 
-//               completer.selectNextPossibleValue(); 
-//           else 
-               completer.showPopup(); 
+    	   completer.showPopup(); 
        } 
    }
     static Action showAction = new AbstractAction(){ 
@@ -175,27 +131,7 @@ public abstract class CompletionPopUp{
             show(tf);
         } 
     }; 
- 
-//    static Action upAction = new AbstractAction(){ 
-//        public void actionPerformed(ActionEvent e){ 
-//            JComponent tf = (JComponent)e.getSource(); 
-//            CompletionPopUp completer = (CompletionPopUp)tf.getClientProperty(COMPLETION); 
-//            if(tf.isEnabled()){ 
-//                if(completer.popup.isVisible()) 
-//                    completer.selectPreviousPossibleValue(); 
-//            } 
-//        } 
-//    }; 
- 
-    static Action hidePopupAction = new AbstractAction(){ 
-        public void actionPerformed(ActionEvent e){ 
-            JComponent tf = (JComponent)e.getSource(); 
-            CompletionPopUp completer = (CompletionPopUp)tf.getClientProperty(COMPLETION); 
-            if(tf.isEnabled()) 
-                completer.popup.setVisible(false); 
-        } 
-    }; 
- 
+   
     /** 
      * Selects the next item in the list.  It won't change the selection if the 
      * currently selected item is already the last item. 
@@ -235,28 +171,4 @@ public abstract class CompletionPopUp{
 	public void setLastKey(char lastKey) {
 		this.lastKey = lastKey;
 	}
-
-	public boolean isLeftKey() {
-		return leftKey;
-	}
-
-	public void setLeftKey(boolean leftKey) {
-		this.leftKey = leftKey;
-	}
-
-	public boolean isRightKey() {
-		return rightKey;
-	}
-
-	public void setRightKey(boolean rightKey) {
-		this.rightKey = rightKey;
-	}
-
-	public boolean isBackKey() {
-		return backKey;
-	}
-
-	public void setBackKey(boolean backKey) {
-		this.backKey = backKey;
-	} 
 }

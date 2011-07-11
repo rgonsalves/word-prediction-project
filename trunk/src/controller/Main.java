@@ -23,7 +23,7 @@ import view.PredictionPanel;
 public class Main {
 	private static JDBCWrapper connection;
 //	public static final char[] SEPARATORS={'\\s',',','.',';'};
-	public static final String WORD_SEPARATORS = "[\\s,.;]";
+	public static final String WORD_SEPARATORS = "[\\s,.;$]";
 	private MyTrie<String> words;//HashMap<Character,ArrayList<String>> words;
 	private Set<String> valueSet;
 	private static String[] strArry;

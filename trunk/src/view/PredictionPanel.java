@@ -1,9 +1,13 @@
 package view;
 import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
 import controller.AutoCompleter;
 import controller.MyTextListener;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Scanner;
@@ -27,7 +31,10 @@ public class PredictionPanel extends JFrame implements ActionListener{
 	private MenuItem saveFile = new MenuItem(); // a save option
 	private MenuItem close = new MenuItem(); // and a close option!
 	private  JLabel warning;
-	
+	 //undo helpers
+    protected UndoAction undoAction;
+    protected RedoAction redoAction;
+    protected UndoManager undo = new UndoManager();
 	public static PredictionPanel mainPanel;
 	public static PredictionPanel getMainPanel(){
 		
@@ -40,13 +47,20 @@ public class PredictionPanel extends JFrame implements ActionListener{
 	}
 	
 	private PredictionPanel() {
+		undoAction = new UndoAction();
+	    redoAction = new RedoAction();
+	    
+	    textArea.registerKeyboardAction(undoAction, KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
+	    textArea.registerKeyboardAction(redoAction, KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
+	
 		this.setSize(700, 450); // set the initial size of the window
 		this.setTitle("Word Prediction"); // set the title of the window
 		setDefaultCloseOperation(EXIT_ON_CLOSE); // set the default close operation (exit when it gets closed)
 		this.textArea.setFont(new Font("Century Gothic", Font.BOLD, 12)); // set a default font for the TextArea
 		this.textArea.setColumns(20);
 		this.textArea.setRows(5);
-		
+		textArea.setLineWrap(true);
+		textArea.getDocument().addUndoableEditListener(new MyUndoableEditListener());
 		this.setMinimumSize(new Dimension(1000, 450));
 		predictionPanel.setBackground(new java.awt.Color(204, 204, 204));
 		predictionPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -122,7 +136,72 @@ public class PredictionPanel extends JFrame implements ActionListener{
 		this.file.add(this.close);
 		this.setBackground(Color.red);
 	}
-	
+	 //This one listens for edits that can be undone.
+    protected class MyUndoableEditListener
+                    implements UndoableEditListener {
+        public void undoableEditHappened(UndoableEditEvent e) {
+            //Remember the edit and update the menus.
+            undo.addEdit(e.getEdit());
+            undoAction.updateUndoState();
+            redoAction.updateRedoState();
+        }
+    }
+    class UndoAction extends AbstractAction {
+        public UndoAction() {
+            super("Undo");
+            setEnabled(false);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                undo.undo();
+            } catch (CannotUndoException ex) {
+                System.out.println("Unable to undo: " + ex);
+                ex.printStackTrace();
+            }
+            updateUndoState();
+            redoAction.updateRedoState();
+        }
+
+        protected void updateUndoState() {
+            if (undo.canUndo()) {
+                setEnabled(true);
+                putValue(Action.NAME, undo.getUndoPresentationName());
+            } else {
+                setEnabled(false);
+                putValue(Action.NAME, "Undo");
+            }
+        }
+    }
+
+    class RedoAction extends AbstractAction {
+        public RedoAction() {
+            super("Redo");
+            setEnabled(false);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                undo.redo();
+            } catch (CannotRedoException ex) {
+                System.out.println("Unable to redo: " + ex);
+                ex.printStackTrace();
+            }
+            updateRedoState();
+            undoAction.updateUndoState();
+        }
+
+        protected void updateRedoState() {
+            if (undo.canRedo()) {
+                setEnabled(true);
+                putValue(Action.NAME, undo.getRedoPresentationName());
+            } else {
+                setEnabled(false);
+                putValue(Action.NAME, "Redo");
+            }
+        }
+    }
+
 	public void actionPerformed (ActionEvent e) {
 		// if the source of the event was our "close" option
 		if (e.getSource() == this.close)

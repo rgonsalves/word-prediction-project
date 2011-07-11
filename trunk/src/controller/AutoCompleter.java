@@ -15,10 +15,12 @@ import controller.Main.Word;
 
 // @author Santhosh Kumar T - santhosh@in.fiorano.com 
 public class AutoCompleter extends CompletionPopUp{ 
-	public static int NUMBER_OF_CHARACTERS_CHECKED = 1; 
-//	private int wordBegin;
-//	private int wordEnd;
-//	private int cursorPos;
+	public static int NUMBER_OF_CHARACTERS_CHECKED = 1;
+    public static int MAXIMUM_PREDICTIONS = 8;
+    public static int MAXIMUM_F_KEYS = 13;
+    
+	private int wordBegin;
+	private int wordEnd;
 	private String selectedWord;
 	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
     public AutoCompleter(JTextComponent comp){ 
@@ -31,40 +33,27 @@ public class AutoCompleter extends CompletionPopUp{
      * @return the last word
      */
     private String findCursorWord(String text){
-    	int cursorPos =textComp.getCaret().getDot();
+    	int cursorPos =textComp.getCaret().getDot();//cursor position
     	if(text.length() < cursorPos) //if the user is removing characters
     		cursorPos = text.length();
     	Matcher m = wordSeparatorPattern.matcher(text.substring(0, cursorPos));
-    	Pattern _p = Pattern.compile("\\b"); //word boundary matching
     	String prefix = "";
-    	int wordE = cursorPos;
-    	int wordBegin = 0;
-    	int wordEnd = 0;
-    	 while(m.find()){	// to find the word where the cursor is in
+    	int prefixEnd = cursorPos;
+    	wordBegin = 0;
+    	wordEnd = 0;
+    	while(m.find()){	// to find the word where the cursor is in
     		 wordBegin = m.end();
      	 }
-    	 if(isRightKey() || isLeftKey() || isBackKey()){
-	    	 if(isRightKey() || isLeftKey()){//moving to the right
-	    		 wordE = cursorPos;
-	//    		 prefix = text.substring(wordBegin, wordE).toLowerCase();
-	    	 }
-	    	 if (isBackKey()){
-	    		 wordE = cursorPos - 1;
-	    	 }
-    	 }
-    	 else {//writing
-    		 wordE = cursorPos + 1;
-//    		 m = wordSeparatorPattern.matcher(text.substring(cursorPos,text.length()));
-//    		 if (m.find())
-//    			 wordEnd = cursorPos + m.end();
-    	 }
-    	 prefix = text.substring(wordBegin, wordE).toLowerCase();
+    	 m = wordSeparatorPattern.matcher(text.substring(wordBegin, text.length()));
+    	 if(m.find()) // to find the end of the current word, the word where the cursor is in
+    		 wordEnd = wordBegin + m.end();
+    	 prefix = text.substring(wordBegin, prefixEnd).toLowerCase();
     	 System.err.println("prefix::" + prefix);
      	return prefix;
     }
     
     /***
-     * Finds all the words in the dictionary from a given prefix
+     * Finds all the words in the dictionary from a given prefix and creates the list for the popup
      * @param prefix the prefix
      * @return the words list
      */
@@ -76,7 +65,7 @@ public class AutoCompleter extends CompletionPopUp{
 		if (array != null && prefix != null){
 			int pos = Arrays.binarySearch(array, prefix);
 			if( pos < 0 ) { pos = -pos - 1;}
-			while (pos >= 0 && pos < array.length && count <13) {
+			while (pos >= 0 && pos < array.length && count < MAXIMUM_F_KEYS) {
 				if (array[pos].startsWith(prefix)) {
 					list.add("F"+(count++) +"..."+array[pos]);
 				} else {
@@ -86,7 +75,7 @@ public class AutoCompleter extends CompletionPopUp{
 			}
 		}
 		retrieved = new String[list.size()];
-		for(int i = 0; (i < list.size() && i < 8) ;i++){
+		for(int i = 0; (i < list.size() && i < MAXIMUM_PREDICTIONS) ;i++){
 			retrieved[i] = list.get(i);
 		}
 		return retrieved;
@@ -97,41 +86,20 @@ public class AutoCompleter extends CompletionPopUp{
 	 */
     protected boolean updateListData(){ 
         String allText = textComp.getText();
-       int cursorPos = textComp.getCaret().getDot();
         String word[];
         char lastKey;
         if(allText.length() == 0){
-        	System.err.println("value length eq 0");
         	return false;
         }
-//        cursorPos ++;
-//       NUMBER_OF_CHARACTERS_CHECKED = isRightKey()? NUMBER_OF_CHARACTERS_CHECKED: -NUMBER_OF_CHARACTERS_CHECKED;
-//        if ((cursorPos < allText.length()) && (cursorPos - NUMBER_OF_CHARACTERS_CHECKED>0))
-//        	lastKey = allText.charAt(cursorPos - NUMBER_OF_CHARACTERS_CHECKED);//"" + getLastKey();//
-//        else 
-//        	if(cursorPos - NUMBER_OF_CHARACTERS_CHECKED <= 0){
-        		lastKey = getLastKey();
-//        	}
-//        else
-//        	return false;
-//        	lastKey = allText.substring(cursorPos - 1 + NUMBER_OF_CHARACTERS_CHECKED, cursorPos -1);//is removing characters
-//        int pos = Math.min(textComp.getCaret().getDot(), textComp.getCaret().getMark()); 
-//        try {
-//			int x = textComp.getUI().modelToView(textComp, pos).x;
-//		} catch (BadLocationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
+        lastKey = getLastKey();
+
         Matcher m = wordSeparatorPattern.matcher(""+lastKey);
         
         String prefix = "";
         if(!m.find()){//if last character input is not a space
-        		int limit = cursorPos + 1;
-        		if(limit > allText.length())
-        			limit = allText.length();
-        	    prefix = findCursorWord(allText.substring(0, limit));
+        	    prefix = findCursorWord(allText);//.substring(0, limit));
 		        if(prefix.length() == 0){
-		        	System.err.println("prefix length eq 0");
 		        	return false;
 		        }
 		        word = findMatchess(prefix);
@@ -151,12 +119,12 @@ public class AutoCompleter extends CompletionPopUp{
         if(list.getModel().getSize() >= line){
         	String _selected = (String) list.getModel().getElementAt(line);
         	selectedWord = _selected.split("\\.\\.\\.")[1];
-//        	try{
-////        		textComp.getDocument().remove(wordBegin, wordEnd - wordBegin);
-////        		textComp.getDocument().insertString(wordBegin, selectedWord +" ", null);
-//        	} catch(BadLocationException e){ 
-//        		e.printStackTrace(); 
-//        	} 
+        	try{
+        		textComp.getDocument().remove(wordBegin, wordEnd - wordBegin);
+        		textComp.getDocument().insertString(wordBegin, selectedWord +" ", null);
+        	} catch(BadLocationException e){ 
+        		e.printStackTrace(); 
+        	} 
         }
     } 
 }
