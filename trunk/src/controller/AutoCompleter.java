@@ -1,16 +1,18 @@
 package controller;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
-import controller.Main.Word;
+import utilities.WordFrequencyComparator;
+
+
 
 
 // @author Santhosh Kumar T - santhosh@in.fiorano.com 
@@ -23,7 +25,9 @@ public class AutoCompleter extends CompletionPopUp{
 	private int wordEnd;
 	private String selectedWord;
 	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
-    public AutoCompleter(JTextComponent comp){ 
+	private static final Pattern wordEndPattern = Pattern.compile(Main.WORD_ENDS);// this will find the end of the current word
+    
+	public AutoCompleter(JTextComponent comp){ 
         super(comp);
     } 
  
@@ -36,17 +40,19 @@ public class AutoCompleter extends CompletionPopUp{
     	int cursorPos =textComp.getCaret().getDot();//cursor position
     	if(text.length() < cursorPos) //if the user is removing characters
     		cursorPos = text.length();
-    	Matcher m = wordSeparatorPattern.matcher(text.substring(0, cursorPos));
+    	Matcher m1 = wordSeparatorPattern.matcher(text.substring(0, cursorPos));
     	String prefix = "";
     	int prefixEnd = cursorPos;
     	wordBegin = 0;
     	wordEnd = 0;
-    	while(m.find()){	// to find the word where the cursor is in
-    		 wordBegin = m.end();
+    	while(m1.find()){	// to find the word where the cursor is in
+    		 wordBegin = m1.end();
      	 }
-    	 m = wordSeparatorPattern.matcher(text.substring(wordBegin, text.length()));
-    	 if(m.find()) // to find the end of the current word, the word where the cursor is in
-    		 wordEnd = wordBegin + m.end();
+    	 Matcher m2 = wordEndPattern.matcher(text.substring(wordBegin, text.length()));
+    	 while(m2.find()) // to find the end of the current word, the word where the cursor is in
+    		 wordEnd = wordBegin + m2.start();
+    	 if(wordEnd < wordBegin)
+    		 wordEnd = text.length();
     	 prefix = text.substring(wordBegin, prefixEnd).toLowerCase();
     	 System.err.println("prefix::" + prefix);
      	return prefix;
@@ -57,27 +63,42 @@ public class AutoCompleter extends CompletionPopUp{
      * @param prefix the prefix
      * @return the words list
      */
-	private String[] findMatchess(String prefix){
-	    String [] array = Main.getStrArry();
+	private String[] findMatches(String prefix){
+	    String [] words = Main.getWordArry();
+//	    Integer[] frequencies = Main.getFrequencyArry();
+	    HashMap<String, Integer> wordFreq = Main.getWordFrequency();
+	    HashMap<String,Integer> wordsForSort = new HashMap<String, Integer>();
+	    WordFrequencyComparator sortingWords =  new WordFrequencyComparator(wordsForSort);
+        TreeMap<String, Integer> sortedWords = new TreeMap<String, Integer>(sortingWords);
+	    
+
 	    ArrayList<String> list = new ArrayList<String>();
 		String []retrieved;
 		int count = 1;
-		if (array != null && prefix != null){
-			int pos = Arrays.binarySearch(array, prefix);
+		if ( words != null && prefix != null){
+			int pos = Arrays.binarySearch(words, prefix);
 			if( pos < 0 ) { pos = -pos - 1;}
-			while (pos >= 0 && pos < array.length && count < MAXIMUM_F_KEYS) {
-				if (array[pos].startsWith(prefix)) {
-					list.add("F"+(count++) +"..."+array[pos]);
+			while (pos >= 0 && pos < words.length && count < MAXIMUM_F_KEYS) {
+				if (words[pos].startsWith(prefix)) {
+//					list.add("F"+(count++) +"..."+words[pos]);
+					wordsForSort.put(words[pos], wordFreq.get(words[pos]));
 				} else {
 					break;
 				}
 				pos++;
 			}
 		}
-		retrieved = new String[list.size()];
-		for(int i = 0; (i < list.size() && i < MAXIMUM_PREDICTIONS) ;i++){
-			retrieved[i] = list.get(i);
+		retrieved = new String[wordsForSort.size()];
+		count = 0;
+		sortedWords.putAll(wordsForSort);
+//		for(int i = 0; (i < sortedWords.size() && i < MAXIMUM_PREDICTIONS) ;i++){
+		for(String word: sortedWords.keySet()){
+			retrieved[count] = "F" + (++count) + "..."+word;//list.get(i);
+			if (count == wordsForSort.size() || count == MAXIMUM_PREDICTIONS)
+				break;
 		}
+	
+		
 		return retrieved;
 	}
 	/****
@@ -102,7 +123,7 @@ public class AutoCompleter extends CompletionPopUp{
 		        if(prefix.length() == 0){
 		        	return false;
 		        }
-		        word = findMatchess(prefix);
+		        word = findMatches(prefix);
 		        if(word != null && word.length>0){
 		        	list.setListData(word);        	
 		        	return true;
@@ -120,8 +141,10 @@ public class AutoCompleter extends CompletionPopUp{
         	String _selected = (String) list.getModel().getElementAt(line);
         	selectedWord = _selected.split("\\.\\.\\.")[1];
         	try{
+        		textComp.removeCaretListener(caretListener);
         		textComp.getDocument().remove(wordBegin, wordEnd - wordBegin);
-        		textComp.getDocument().insertString(wordBegin, selectedWord +" ", null);
+        		textComp.getDocument().insertString(wordBegin, selectedWord/* +" "*/, null);
+        		textComp.addCaretListener(caretListener);
         	} catch(BadLocationException e){ 
         		e.printStackTrace(); 
         	} 

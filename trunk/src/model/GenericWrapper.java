@@ -27,7 +27,7 @@ public abstract class GenericWrapper {
 
 	protected Log log = LogFactory.getLog(this.getClass());
 	
-	static 	String CONNECTION_STRING                    =													"jdbc:mysql://localhost:3306/wordnet30";
+	static 	String CONNECTION_STRING	 =		"jdbc:hsqldb:hsql://localhost:9500";//"jdbc:mysql://localhost:3306/wordnet30";
 	/** Data source JDBC 2.0 */
 	static DataSource m_DataSource;
 	static DataSource m_DataSourceXA;
@@ -122,38 +122,6 @@ public abstract class GenericWrapper {
 	}
 
 	/**
-	 * Rollback. Borra todos los cambios realizados desde el anterior
-	 * commit/rollback y elimina cualquier blqueo d ela base de datos 
-	 * para esta conexion
-	 * @exception SQLException	
-	 */
-	public void rollback() throws SQLException {
-		try {
-			m_Connection.rollback();
-		}
-		catch (SQLException e) {
-			log.error( "Error durante la realizacion del rollback."+e.toString());
-			throw e;
-		}
-	}
-
-	/**
-	 * Commit. Realiza todos los cambios realizados desde el anterior
-	 * commit/rollback y elimina cualquier blqueo d ela base de datos 
-	 * para esta conexion. 
-	 * @exception Exception	
-	 */    
-	public void commit() throws SQLException {
-		try {
-			m_Connection.commit();
-		}
-		catch (SQLException e) {
-			log.error("Error trying to commit."+e.toString());
-			throw e;
-		}
-	}
-
-	/**
 	 * Funcion auxiliar que segun los parametros de entrada que recibe, los analiza
 	 * y los a_ade al statement para su correcta ejecucion. 
 	 * @param params Parametros de entrada
@@ -191,37 +159,7 @@ public abstract class GenericWrapper {
 				else if (className.equals("java.sql.Timestamp")) {
 					m_Prep.setTimestamp(i + 1, (java.sql.Timestamp) params.elementAt(i));
 				}
-				/*else if (className.equals("java.io.StringReader")) {	//Si el param es StringReader lo tratamos como BLOB
-					//log.debug("campo StringReader!! ");      
-					StringReader strReader = (StringReader)params.elementAt(i);
-
-					StringWriter out= new StringWriter();
-					char[] buffer= new char[256];
-					while (true) {
-						int n= strReader.read(buffer);
-						if (n < 0)
-							break;
-						out.write(buffer, 0, n);
-					}
-					strReader.close();
-					out.close();
-
-					String destino = out.toString(); 
-					//log.debug("String: "+destino);
-					oracle.sql.CLOB newClob = oracle.sql.CLOB.createTemporary(getConnection(), false, oracle.sql.CLOB.DURATION_SESSION);
-					newClob.putString(1,destino);
-					m_Cs.setClob(i + 1, newClob);
-				}*/
-				/*else if (className.equals("[B")) {	//Si el param es un array de bytes lo tratamos diferente
-					log.debug("Param Byte[] ");
-					byte[] byteArray = (byte [])params.elementAt(i);            		
-					ByteArrayInputStream is = new ByteArrayInputStream(byteArray); 
-					BLOB blob = BLOB.createTemporary(getConnection(), true, BLOB.DURATION_SESSION);          		
-					OutputStream blob_os = blob.getBinaryOutputStream();
-					blob_os.write(byteArray);
-					blob_os.flush();
-					m_Cs.setBlob(i + 1, blob);
-				}*/
+			
 				else {
 					// The class of one of parameters is not dealt here
 					log.error("Error.JDBCWrapper.ExecutionSQL.unknownParameterClass");
@@ -275,97 +213,6 @@ public abstract class GenericWrapper {
 				else if (className.equals("java.sql.Timestamp")) {
 					m_Cs.setTimestamp(pos + 1, (java.sql.Timestamp) params.elementAt(pos));
 				}
-				/*else if (className.equals("oracle.sql.CLOB")) {
-					log.debug("campo CLOB");                  
-					m_Cs.setClob(pos + 1, (oracle.sql.CLOB) params.elementAt(pos));
-				}*/
-				/*else if (className.equals("java.io.StringReader")) {	//Si el param es StringReader lo tratamos como BLOB
-					log.debug("campo StringReader!! ");      
-					StringReader strReader = (StringReader)params.elementAt(pos);
-
-					StringWriter out= new StringWriter();
-					char[] buffer= new char[256];
-					while (true) {
-						int n= strReader.read(buffer);
-						if (n < 0)
-							break;
-						out.write(buffer, 0, n);
-					}
-					strReader.close();
-					out.close();
-
-					String destino = out.toString(); 
-					//log.debug("String: "+destino);
-					oracle.sql.CLOB newClob = oracle.sql.CLOB.createTemporary(getConnection(), false, oracle.sql.CLOB.DURATION_SESSION);
-					newClob.putString(1,destino);
-					m_Cs.setClob(pos + 1, newClob);
-				}*/
-				/*
-				else if (className.equals("[B")) {	//Si el param es un array de bytes lo tratamos diferente
-					log.debug("Param Byte[] ");
-					byte[] byteArray = (byte [])params.elementAt(pos);            		
-					ByteArrayInputStream is = new ByteArrayInputStream(byteArray); 
-					BLOB blob = BLOB.createTemporary(getConnection(), true, BLOB.DURATION_SESSION);          		
-					OutputStream blob_os = blob.getBinaryOutputStream();
-					blob_os.write(byteArray);
-					blob_os.flush();
-					m_Cs.setBlob(pos + 1, blob);
-				}*/
-				else {
-					// The class of one of parameters is not dealt here
-					log.error("Error.JDBCWrapper.ExecutionSQL.unknownParameterClass");
-					throw new Exception("Error.JDBCWrapper.ExecutionSQL.unknownParameterClass");
-				}
-			}
-			else {
-				log.error("Parameter NULL "+pos);
-				m_Cs.setObject(pos + 1, null);
-			}
-		}
-	}
-
-	/**
-	 * Funcion auxiliar que segun los parametros de entrada que recibe, los analiza
-	 * y los a_ade al Callablestatement para su correcta ejecucion. 
-	 * @param params Parametros de entrada
-	 * @param pos posicion
-	 * @throws Exception
-	 */
-	public void callStatement_Params(Vector<Object> params, CallableStatement cstm) throws Exception
-	{
-		int pos;
-		m_Cs=cstm;
-		for (pos = 0; pos < params.size(); pos++) {
-
-			if (params.elementAt(pos) != null) {
-				String className = params.elementAt(pos).getClass().getName();
-				log.debug("param pos: "+pos+" , className: ->"+className+"<-");
-				if (className.equals("java.lang.String")) {
-					m_Cs.setString(pos + 1, (String) params.elementAt(pos));
-				}
-				else if (className.equals("java.lang.Integer")) {
-					m_Cs.setInt(pos + 1, ( (Integer) params.elementAt(pos)).intValue());
-				}
-				else if (className.equals("java.lang.Long")) {
-					m_Cs.setLong(pos + 1, ( (Long) params.elementAt(pos)).longValue());
-				}
-				else if (className.equals("java.lang.Double")) {
-					m_Cs.setDouble(pos + 1, ( (Double) params.elementAt(pos)).doubleValue());
-				}
-				else if (className.equals("java.util.Date")) {
-					m_Cs.setTimestamp(pos + 1,
-							new java.sql.Timestamp( ( (java.util.Date)
-									params.elementAt(pos)).getTime()));
-				}
-				else if (className.equals("java.sql.Date")) {
-					m_Cs.setDate(pos + 1, (java.sql.Date) params.elementAt(pos));
-				}
-				else if (className.equals("java.sql.Time")) {
-					m_Cs.setTime(pos + 1, (java.sql.Time) params.elementAt(pos));
-				}
-				else if (className.equals("java.sql.Timestamp")) {
-					m_Cs.setTimestamp(pos + 1, (java.sql.Timestamp) params.elementAt(pos));
-				}
 			
 				else {
 					// The class of one of parameters is not dealt here
@@ -379,67 +226,8 @@ public abstract class GenericWrapper {
 			}
 		}
 	}
-	/**
-	 * METODO executeUpdate SOBRECARGADO con la realizacion de autoCommit
-	 * Ejecuta una consulta SQL con parametros. El resultado se guarda en el Resultset.
-	 * @param sql Consulta a ejecutar
-	 * @param params Lista de parametros de entrada (vector)
-	 * @exception Exception en caso de error cuando es ejecutado (SQL error, por ejemplo).
-	 */
-	public void executeUpdate(String sql, Vector<Object> params, boolean autoCommit) throws Exception {
-		try {
-			beforeExecute();
-			m_Prep = getConnection().prepareStatement(sql);
 
-			prepararParams(params);
-
-			//campo pasado como parametro para habilitar o desabilitar autoCommit
-			m_Connection.setAutoCommit(autoCommit);
-
-			m_Prep.executeUpdate();
-		}
-		catch (SQLException e) {
-			log.error( "Error en execute update "+ e.toString());
-			String message = e.getMessage();
-			if (message.indexOf("ORA-08177") != -1) {
-				log.error("ORA-08177 up: request re-executed");
-				int countdown = 5;
-				boolean requete_executee = false;
-				while ( (countdown != 0) && (requete_executee == false)) {
-					try {
-						countdown--;
-						m_Rset = m_Prep.executeQuery();
-						requete_executee = true;
-					}
-					catch (Exception error) {
-						String messageb = error.getMessage();
-						if (messageb.indexOf("ORA-08177") != -1) {
-							log.error( "New try "+ error.toString());
-							requete_executee = false;
-						}
-						else {
-							log.error( "Error.JDBCWrapper.ExecutionSQL "+ error.toString());
-							throw e;
-						}
-					}
-				}
-				if (requete_executee == false) {
-					log.error("Error de conexi_n de la petici_n SQL."+ e.toString());
-					throw e;
-				}
-			}
-			else {
-				log.error( "Error de conexi_n de la petici_n SQL."+ e.toString());
-				throw e;
-			}
-		}
-		catch (Exception e) {
-			log.error("Exception:"+	e.toString());
-			throw e;
-		}
-	}
-
-
+	
 	/**
 	 * closes  PreparedStatement
 	 * @exception Exception	if there is any problem trying to close  PreparedStatement
@@ -658,66 +446,6 @@ public abstract class GenericWrapper {
 	}
 
 	/**
-	 * Ejecuta una actualizacion SQL sin parametros. El resultado se guarda en la variable
-	 * de clase m_Rset (Resultset).
-	 * @param sql Consulta SQL request a ejecutar
-	 * @param params Lista de parametros de entrada (vector)
-	 * @exception Exception
-	 */
-	public void executeUpdate(String sql, Vector<Object> params) throws Exception {
-		try {
-			beforeExecute();
-			m_Prep = getConnection().prepareStatement(sql);
-			prepararParams(params);
-			log.debug("Executing "+sql+" Params:"+paramToString(params));
-			m_Prep.executeUpdate();
-			log.debug("Execution performed");
-			this.ResultadoNonQuery=1;
-		}
-		catch (SQLException e) {
-			String message = e.toString();
-			log.error( "Error de SQL "+ message);
-			if (message.indexOf("ORA-08177") != -1) {
-				log.error( "ORA-08177 up: request re-executed");
-				int countdown = 5;
-				boolean requete_executee = false;
-				while ( (countdown != 0) && (requete_executee == false)) {
-					try {
-						countdown--;
-						m_Rset = m_Prep.executeQuery();
-						requete_executee = true;
-					}
-					catch (Exception error) {
-						String messageb = error.getMessage();
-						if (messageb.indexOf("ORA-08177") != -1) {
-							log.error( "New try"+" "+error.toString());
-							requete_executee = false;
-						}
-						else {
-							log.error( "Error de conexi_n de la petici_n SQL."+
-									error.toString());
-							throw new Exception("Error de conexi_n de la petici_n SQL." +
-									e.toString());
-						}
-					}
-				}
-				if (requete_executee == false) {
-					log.error( "Error de conexi_n de la petici_n SQL. "+e.toString());
-					throw new Exception("Error de conexi_n de la petici_n SQL." +
-							e.toString());
-				}
-			}
-			else {
-				throw new Exception("Error de conexi_n de la petici_n SQL." +
-						e.toString());
-			}
-		}
-		catch (Exception e) {
-			throw new Exception("Error de conexi_n de la petici_n SQL." + e.toString());
-		}
-	}
-
-	/**
 	 * Metodo ejecutado antes de eliminar el objeto JDBCWrapper de la memoria
 	 * Cierra la conexi_n a la base de datos si no se hace todav_a.
 	 *  El metodo cerrar se debe llamar expl_citamente sobre los objetos JDBCWrapper
@@ -730,25 +458,6 @@ public abstract class GenericWrapper {
 		close();
 	}
 
-	/*protected Connection getConnection() throws Exception {
-		if (m_Connection == null) {
-			try {
-				//log.write(0, "Retrieve connection from a data source.");
-				m_Connection = getDataSource().getConnection();
-				//log.write(0, "Retrieve connection from a finished data source.");
-				m_IsConnected = true;
-			}
-			catch (SQLException e) {
-				log.error("Error de recuperaci_n de una conexi_n a partir de la fuente de datos."+
-						e.toString());
-				throw new Exception(
-						"Error de recuperaci_n de una conexi_n a partir de la fuente de datos." +
-						e.toString());
-			}
-		}
-		return m_Connection;
-	}*/
-	
 	/**
 	 * Recupera una conexion a la base de datos
 	 * 
@@ -757,94 +466,23 @@ public abstract class GenericWrapper {
 	protected Connection getConnection() throws Exception {
 		if (m_Connection == null) {
 			try {
-//				if (isODBC) {
-//					ODBCPath=DataBaseUtil.getDataSource(this.dbvo);
-//					//ODBCPath="jdbc:odbc:dbPRV";
-//					
-//					 //without pooled connection
-//					Class.forName("sun.jdbc.odbc.JdbcOdbcDriver").newInstance();
-//					m_Connection = DriverManager.getConnection(ODBCPath);
-//					
-//					/*sun.jdbc.odbc.ee.DataSource ds = new sun.jdbc.odbc.ee.DataSource();
-//					//ConnectionPoolDataSource cpds= new ConnectionPoolFactory.
-//	
-//					
-//					ds.setPassword("SORALUCE");
-//					ds.setDatabaseName(ODBCPath);
-//					ds.setLoginTimeout(100);
-//					ds.setDataSourceName(ODBCPath);
-//					
-//					m_Connection =ds.getConnection();
-//					
-//					*/
-//					/*
-//					 * //pooling connection
-//					String env="jdbc/mdb:M"+this.machineVO.getMachineId()+"S"+this.machineVO.getMachineService().getServiceId();
-//					sun.jdbc.odbc.ee.ConnectionPoolDataSource cpds = new sun.jdbc.odbc.ee.ConnectionPoolDataSource("jdbc/mdb");
-//					//sun.jdbc.odbc.ee.DataSource ds=new sun.jdbc.odbc.ee.DataSource();
-//					// Provide user credentials and database name
-//		            cpds.setUser("");
-//		            cpds.setPassword("SORALUCE");
-//		            cpds.setDatabaseName(ODBCPath);
-//		            //cpds.setCharSet("..."); // optional property
-//		            cpds.setLoginTimeout(100); // optional property
-//		            cpds.setMinPoolSize("10"); 
-//		            cpds.setInitialPoolSize("15");
-//		            cpds.setMaxPoolSize("10");
-//		            cpds.setMaxIdleTime("300");
-//		            cpds.setTimeoutFromPool("600");
-//		            
-//		            // Maintenance interval of the pool. A maintenance thread will remove
-//		            // unwanted connections and cleanup the pool at the interval specified.
-//		            // This cannot be zero.
-//		            cpds.setMaintenanceInterval("900");
-//		            InitialContext ic = new InitialContext();
-//		            
-//		            Context envContext = (Context) ic.lookup ("java:comp/env");
-//		            DataSource ds2=(DataSource)envContext.lookup("jdbc/mdb");
-//		            envContext.createSubcontext("jdbc/mdb2");
-//		            envContext.bind("jdbc/mdb",cpds);
-//		           // ic.addToEnvironment(env,cpds);
-//		            //ic.bind("jdbc/mdb",cpds);
-//		            
-//		            
-//		            InitialContext ic2 = new InitialContext();
-//		            Context envContext2 = (Context) ic2.lookup ("java:comp/env");
-//		            javax.sql.DataSource ds = (javax.sql.DataSource) envContext2.lookup(env);
-//
-//		            // First getConnection will initializes the pool.
-//		            m_Connection= cpds.getConnection();*/
-//		            
-//		            
-//				} else {
-					// log.write(0, "Retrieve connection from a data source.");
-//					m_Connection = getDataSource().getConnection();
-//					log.debug("Generic wrapper::Trying to get connections::"+Constants.CONNECTION_STRING);
+
 //					try {
-//						Class.forName("org.gjt.mm.mysql.Driver").newInstance();
+						Class.forName("org.hsqldb.jdbcDriver");//DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+//						} catch (SQLException e) {
+//							System.out.println("Oops! Got a MySQL error: " + e.getMessage());
 //						}
-//					catch(Exception e){
-//						e.printStackTrace();
-//					}
-					try {
-						DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-						} catch (SQLException e) {
-							System.out.println("Oops! Got a MySQL error: " + e.getMessage());
-						}
-						catch (Exception e) {
-							System.out.println("Oops! Got a error: " + e.getMessage());
-						}
+//						catch (Exception e) {
+//							System.out.println("Oops! Got a error: " + e.getMessage());
+//						}
 					Properties connProperties=new Properties();
-					connProperties.put("user", "root");//Constants.USER_STRING);
+					connProperties.put("user", "sa");//Constants.USER_STRING);
 					connProperties.put("password", "");//Constants.PASSWORD_STRING);
 					connProperties.put("autoReconnect", "true");
 					connProperties.put("zeroDateTimeBehavior","convertToNull");
 				
-					m_Connection = DriverManager.getConnection(CONNECTION_STRING,connProperties);//"+serverIp+":"+serverPort+"/"+dbName");/*Constants.CONNECTION_STRING,connProperties);*///Constants.CONNECTION_STRING,"titran","titran");//
-					// (es.ideko.msim.poum.Constants.CONNECTION_STRING,"root","");//getDataSource().getConnection();
-					log.debug("Generic wrapper::CONNECTION STRING::"+"jdbc:mysql://localhost:3306/wordnet30");
+					m_Connection = DriverManager.getConnection(CONNECTION_STRING,connProperties);
 					m_IsConnected = true;
-//				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -852,8 +490,8 @@ public abstract class GenericWrapper {
 		return m_Connection;
 	}
 
-	/** Recupera el DataSource de la cache para mejorar el funcionamiento. */
-	abstract DataSource getDataSource() throws Exception;
+//	/** Recupera el DataSource de la cache para mejorar el funcionamiento. */
+//	abstract DataSource getDataSource() throws Exception;
 
 	/**
 	 * Obtiene la fecha de un campo mediante el m_todo getTimeStamp.
@@ -1114,100 +752,6 @@ public abstract class GenericWrapper {
 		}
 		return booleanRetour;
 	}
-
-
-	/**
-	 * Obtiene el valor del parametro de salida que se indique.
-	 * @param index Posicion del parametro de salida a recoger
-	 * @return
-	 * @throws Exception
-	 */
-	public Object getStProcedureObject(int index) throws Exception {
-		try {
-			return m_Cs.getObject(index);
-		}
-		catch (Exception e) {
-			log.error( "Error al recuperar el parametro " + index+" "+e.toString());
-			throw new Exception("Error al recuperar el parametro " + index + " " + 
-					e.toString());
-		}
-	}
-
-	/**
-	 * Navega a traves de los elementos de salida. Va al siguiente elemento.
-	 * @return True si hay un elemento siguiente, sino false
-	 * @exception Exception
-	 */
-	public boolean nextResultStProcedure() throws Exception {
-
-		boolean booleanRetour = false;
-		try {
-			booleanRetour = m_Cs.getMoreResults();
-		}
-		catch (SQLException e) {
-			String message = e.getMessage();
-			log.error( "Error al recuperar el siguiente elemento"+ message);
-			if (message.indexOf("ORA-08177") != -1) {
-				log.error("ORA-08177 up: request re-executed over JDBCWrapper.next()");
-				int countdown = 5;
-				boolean requete_executee = false;
-				while ( (countdown != 0) && (requete_executee == false)) {
-					try {
-						countdown--;
-						booleanRetour = m_Rset.next();
-						requete_executee = true;
-					}
-					catch (Exception error) {
-						String messageb = error.getMessage();
-						if (messageb.indexOf("ORA-08177") != -1) {
-							log.error("New try"+" "+messageb);
-							requete_executee = false;
-						}
-						else {
-							log.error( "Error.JDBCWrapper.ResultatSQL"+" "+ error.toString());
-							throw new Exception("Error.JDBCWrapper.ResultatSQL " + 
-									error.toString());
-						}
-					}
-				}
-				if (requete_executee == false) {
-					log.error( "Error.JDBCWrapper.ResultatSQL"+" "+ e.toString());
-					throw new Exception("Error.JDBCWrapper.ResultatSQL " + e.toString());
-				}
-			}
-			else {
-				log.error( "Error.JDBCWrapper.ResultatSQL"+" "+ e.toString());
-				throw new Exception("Error.JDBCWrapper.ResultatSQL " + e.toString());
-			}
-		}
-		catch (Exception e) {
-			log.error( "Error.JDBCWrapper.ResultatSQL"+" "+e.toString());
-			throw new Exception("Error.JDBCWrapper.ResultatSQL" + e.toString());
-		}
-		return booleanRetour;
-	}
-
-	public CallableStatement prepareCall(String sql) throws Exception {
-		CallableStatement cs = null;
-		try {
-			cs = getConnection().prepareCall(sql);
-		}
-		catch (Exception e) {
-			String message = "Error durante la inicializaci_n del recordset antes de un ejecuci_n de petici_n. ";
-			log.error( message+" "+ e.toString());
-			throw new Exception(e.toString());
-		}
-		return cs;
-	}
-//
-//	public DBValueObject getDbvo() {
-//		return dbvo;
-//	}
-//
-//	public void setDbvo(DBValueObject dbvo) {
-//		this.dbvo = dbvo;
-//	}
-
 
 	@SuppressWarnings("unchecked")
 	private String paramToString(Vector v){

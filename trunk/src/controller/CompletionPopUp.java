@@ -50,23 +50,22 @@ public abstract class CompletionPopUp{
 	        scroll.setBorder(null); 
 	 
 	        list.setFocusable( false );
-	        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+	        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	        scroll.getVerticalScrollBar().setFocusable( false ); 
 	        scroll.getHorizontalScrollBar().setFocusable( false ); 
 	 
 	        popup.setBorder(BorderFactory.createLineBorder(Color.black)); 
 	        popup.add(scroll); 
 	 
-	        if(textComp instanceof JTextArea){ 
+//	        if(textComp instanceof JTextArea){ 
 	           
 	            if(!added){
 	            	textComp.addCaretListener(caretListener);
 	            	textComp.registerKeyboardAction(showAction, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), JComponent.WHEN_FOCUSED);
-//	            	textComp.registerKeyboardAction(undoAction, KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED);
-	            	
+      	
 	            	added = true;
 	            }
-	        }
+//	        }
 	        list.setRequestFocusEnabled(false);
 	      
 	    }
@@ -84,11 +83,7 @@ public abstract class CompletionPopUp{
 		
 		@Override
 		public void caretUpdate(CaretEvent e) {
-			
 			show(textComp);
-//			String text = textComp.getText();
-//			if(PredictionPanel.getMainPanel().getSize().getWidth() > textComp.getText().length())
-//				textComp.setText(text + '\n');
 		}
 	};
 
@@ -131,33 +126,7 @@ public abstract class CompletionPopUp{
             show(tf);
         } 
     }; 
-   
-    /** 
-     * Selects the next item in the list.  It won't change the selection if the 
-     * currently selected item is already the last item. 
-     */ 
-//    protected void selectNextPossibleValue(){ 
-//        int si = list.getSelectedIndex(); 
-// 
-//        if(si < list.getModel().getSize() - 1){ 
-//            list.setSelectedIndex(si + 1); 
-//            list.ensureIndexIsVisible(si + 1); 
-//        } 
-//    } 
-// 
-    /** 
-     * Selects the previous item in the list.  It won't change the selection if the 
-     * currently selected item is already the first item. 
-     */ 
-//    protected void selectPreviousPossibleValue(){ 
-//        int si = list.getSelectedIndex(); 
-// 
-//        if(si > 0){ 
-//            list.setSelectedIndex(si - 1); 
-//            list.ensureIndexIsVisible(si - 1); 
-//        } 
-//    } 
- 
+  
     // update list model depending on the data in textfield 
     protected abstract boolean updateListData(); 
  

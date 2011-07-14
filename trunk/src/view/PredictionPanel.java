@@ -7,19 +7,18 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 import controller.AutoCompleter;
-import controller.MyTextListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Scanner;
 import java.io.*;
 
 public class PredictionPanel extends JFrame implements ActionListener{
-	private JTextArea textArea = new JTextArea("", 0,0);
-	public JTextArea getTextArea() {
+	private JEditorPane textArea = new JEditorPane();
+	public JEditorPane getTextArea() {
 		return textArea;
 	}
 
-	public void setTextArea(JTextArea textArea) {
+	public void setTextArea(JEditorPane textArea) {
 		this.textArea = textArea;
 	}
 	private JPanel predictionPanel = new JPanel();
@@ -57,9 +56,9 @@ public class PredictionPanel extends JFrame implements ActionListener{
 		this.setTitle("Word Prediction"); // set the title of the window
 		setDefaultCloseOperation(EXIT_ON_CLOSE); // set the default close operation (exit when it gets closed)
 		this.textArea.setFont(new Font("Century Gothic", Font.BOLD, 12)); // set a default font for the TextArea
-		this.textArea.setColumns(20);
-		this.textArea.setRows(5);
-		textArea.setLineWrap(true);
+//		this.textArea.setColumns(20);
+//		this.textArea.setRows(5);
+//		textArea.setLineWrap(true);
 		textArea.getDocument().addUndoableEditListener(new MyUndoableEditListener());
 		this.setMinimumSize(new Dimension(1000, 450));
 		predictionPanel.setBackground(new java.awt.Color(204, 204, 204));
@@ -85,6 +84,25 @@ public class PredictionPanel extends JFrame implements ActionListener{
 	                .addGap(21, 21, 21))
 	        );
 
+//	         layout.setHorizontalGroup(
+//	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//	            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+//	                .addContainerGap()
+//	                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+//	                    .addComponent(textArea, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 677, Short.MAX_VALUE)
+//	                    .addComponent(predictionPanel, javax.swing.GroupLayout.Alignment.LEADING,300, javax.swing.GroupLayout.DEFAULT_SIZE, 300))
+//	                .addContainerGap())
+//	        );
+//	        layout.setVerticalGroup(
+//	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//	            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+//	                .addContainerGap()
+//	                .addComponent(textArea, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+//	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+//	                .addComponent(predictionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+//	                .addGap(21, 21, 21))
+//	        );
+	         
 
 	    warning = new JLabel("messages",JLabel.LEFT);
 	    mPanel.add(textArea);
@@ -214,18 +232,18 @@ public class PredictionPanel extends JFrame implements ActionListener{
 			// NOTE: because we are OPENing a file, we call showOpenDialog~
 			// if the user clicked OK, we have "APPROVE_OPTION"
 			// so we want to open the file
-			if (option == JFileChooser.APPROVE_OPTION) {
-				this.textArea.setText(""); // clear the TextArea before applying the file contents
-				try {
-					// create a scanner to read the file (getSelectedFile().getPath() will get the path to the file)
-					Scanner scan = new Scanner(new FileReader(open.getSelectedFile().getPath()));
-					while (scan.hasNext()) // while there's still something to read
-						this.textArea.append(scan.nextLine() + "\n"); // append the line to the TextArea
-				} catch (Exception ex) { // catch any exceptions, and...
-					// ...write to the debug console
-					System.out.println(ex.getMessage());
-				}
-			}
+//			if (option == JFileChooser.APPROVE_OPTION) {
+//				this.textArea.setText(""); // clear the TextArea before applying the file contents
+//				try {
+//					// create a scanner to read the file (getSelectedFile().getPath() will get the path to the file)
+//					Scanner scan = new Scanner(new FileReader(open.getSelectedFile().getPath()));
+//					while (scan.hasNext()) // while there's still something to read
+//						this.textArea.append(scan.nextLine() + "\n"); // append the line to the TextArea
+//				} catch (Exception ex) { // catch any exceptions, and...
+//					// ...write to the debug console
+//					System.out.println(ex.getMessage());
+//				}
+//			}
 		}
 		
 		// and lastly, if the source of the event was the "save" option

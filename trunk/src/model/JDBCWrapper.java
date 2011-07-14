@@ -1,5 +1,10 @@
 package model;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
 import javax.sql.*;
 
 import org.apache.commons.logging.Log;
@@ -10,10 +15,11 @@ import org.apache.commons.logging.LogFactory;
  * Clase que extiende del GenericWrapper que empaqueta todas 
  * las acciones jdbc especificas relativas a la conexion BD. 
  */
-public class JDBCWrapper extends GenericWrapper {
+public class JDBCWrapper extends GenericWrapper{
 	private static JDBCWrapper connection = null;
 	private Log log = LogFactory.getLog(this.getClass());
-
+	/** Conexion a la base de datos */
+	private Connection m_Connection;
 	/**
 	 * Constructor. Used in poum package for mysql
 	 * @param dataSourceName El datasource donde nos queremos conectar
@@ -37,32 +43,35 @@ public class JDBCWrapper extends GenericWrapper {
 		}
 		return connection;
 	}
-	
-	public DataSource getDataSource() throws Exception {
-		try {
-			
-//			isTransactional = false;
-//			if (m_DataSource == null) {
-//				synchronized (this) {
-//					if (m_DataSource == null) {
-//					//	Context context = new InitialContext();
-//					//	context.bind(Constants.MYSQL_DATASOURCE,"jdbc/POUMmysqlDB");
-//
-//						m_DataSource = (DataSource) context.lookup ("jdbc:mysql://localhost/titran");//m_dataSourceName);//("jdbc/POUMmysqlDB");"jdbc:mysql://localhost/titran"
+	/**
+	 * Recupera una conexion a la base de datos
+	 * 
+	 * @return una conexion
+	 */
+	protected Connection getConnection() throws Exception {
+		if (m_Connection == null) {
+			try {
 
-//							InitialContext initialContext = new InitialContext ();
-//							Context envContext = (Context) initialContext.lookup ("java:comp/env");
-//							m_DataSource = (DataSource) envContext.lookup (m_dataSourceName);//("jdbc/POUMmysqlDB");
-
-//					}
-//				}
-//			}
+//					try {
+						Class.forName("org.hsqldb.jdbcDriver");//DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+//						} catch (SQLException e) {
+//							System.out.println("Oops! Got a MySQL error: " + e.getMessage());
+//						}
+//						catch (Exception e) {
+//							System.out.println("Oops! Got a error: " + e.getMessage());
+//						}
+					Properties connProperties=new Properties();
+					connProperties.put("user", "sa");//Constants.USER_STRING);
+					connProperties.put("password", "");//Constants.PASSWORD_STRING);
+					connProperties.put("autoReconnect", "true");
+					connProperties.put("zeroDateTimeBehavior","convertToNull");
+				
+					m_Connection = DriverManager.getConnection(CONNECTION_STRING,connProperties);
+					m_IsConnected = true;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		catch (Exception e) {
-			log.error( "Error al crear la conexion "+ e.toString());
-			throw e;
-		}
-		return m_DataSource;
+		return m_Connection;
 	}
-
 }
