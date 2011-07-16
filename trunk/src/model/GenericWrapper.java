@@ -55,7 +55,12 @@ public abstract class GenericWrapper {
 	static String m_dataSourceName;
 
 	/** Constructor del objeto <code>JDBCWrapper</code>. */
-	public GenericWrapper() {}
+	public GenericWrapper() {
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.indexOf("win") < 0) {//linux
+//			CONNECTION_STRING = "jdbc:hsqldb:file:words"
+		}
+	}
 
 	/**
 	 * Este m_todo permite preparar la ejecuci_n de una petici_n que cierra eventualmente

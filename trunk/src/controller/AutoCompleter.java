@@ -44,7 +44,7 @@ public class AutoCompleter extends CompletionPopUp{
     	String prefix = "";
     	int prefixEnd = cursorPos;
     	wordBegin = 0;
-    	wordEnd = 0;
+    	wordEnd = 1;
     	while(m1.find()){	// to find the word where the cursor is in
     		 wordBegin = m1.end();
      	 }
