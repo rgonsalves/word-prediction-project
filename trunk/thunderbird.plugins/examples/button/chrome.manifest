@@ -1,0 +1,4 @@
+content    javaDemo content/
+locale    javaDemo    en-US    locale/en-US/
+overlay    chrome://messenger/content/messengercompose/messengercompose.xul chrome://javaDemo/content/thunderbirdOverlay.xul
+style chrome://global/content/customizeToolbar.xul chrome://javaDemo/content/button.css
