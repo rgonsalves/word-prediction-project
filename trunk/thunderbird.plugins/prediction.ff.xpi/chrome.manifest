@@ -1,0 +1,5 @@
+content    javaDemo content/
+locale    javaDemo    en-US    locale/en-US/
+skin    javaDemo    classic/1.0    skin/
+overlay    chrome://browser/content/browser.xul chrome://javaDemo/content/firefoxOverlay.xul
+resource javaDemo modules/
