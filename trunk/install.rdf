@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<RDF 
+    xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:name>Java Demo</em:name>
+    <em:id>word-prediction@project.team</em:id>
+    <em:version>0.1</em:version>
+    <em:creator>Brett Zamir</em:creator>
+    <em:description>Demonstrates how to use Java inside a Firefox extension</em:description>
+    <em:homepageURL>http://brett-zamir.me/java_demo/</em:homepageURL>
+    <!-- 
+    	Target application is Firefox. You can try specifying other Mozilla
+    	applications such as Thunderbird and see.
+    -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>5.0</em:maxVersion>
+      </Description>
+    </em:targetApplication> 
+  </Description>
+</RDF>
