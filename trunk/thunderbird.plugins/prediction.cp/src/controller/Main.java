@@ -1,7 +1,5 @@
 package controller;
 
-
-
 //import java.io.ObjectInputStream.GetField;
 import java.lang.reflect.Array;
 import java.sql.SQLException;
@@ -16,7 +14,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import model.GenericWrapper;
-import model.JDBCWrapper;
+import model.JDBCConnection;
 
 import ds.tree.RadixTree;
 
@@ -25,110 +23,92 @@ import ds.tree.RadixTree;
 import utilities.MyTrie;
 import utilities.WordFrequencyComparator;
 
-
 public class Main {
-	private static JDBCWrapper connection;
-//	public static final char[] SEPARATORS={'\\s',',','.',';'};
 	public static final String WORD_SEPARATORS = "[\\s,.;]";
 	public static final String WORD_ENDS = "[\\W]";
-//	private MyTrie<String> words;//HashMap<Character,ArrayList<String>> words;
+	// private MyTrie<String> words;//HashMap<Character,ArrayList<String>>
+	// private ArrayList<Integer> frequencyArray;
+	// private static Integer[] frequencyArry;
 	private ArrayList<String> wordArray;
-	private ArrayList<Integer> frequencyArray;
 	private static HashMap<String, Integer> wordFrequency;
-//	private static Integer[] frequencyArry;
 	private static String[] wordArry;
-    private static TreeMap<String, Integer> sortedWords;
-	
-	
-	
-    public static void main(String args[]) {
-    	Main.init("");
-    }
-	public Main(){
-//		start = System.currentTimeMillis();
-		
-	}
-	 public static String init(String connectionString) {
-		 GenericWrapper.CONNECTION_STRING = connectionString;
-		 try {
-			 connection = JDBCWrapper.getConnectionInstance();
-		 } catch (Exception e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-			 return e.getMessage();
-		 }
-		 wordFrequency = new HashMap<String, Integer>();
-		 Main predictor = new Main();
-		 int frequency;
-		 String lemma = "";
-		 String str ="";
-//		 String aux = "";
-//		 int count = 0;
-		 predictor.wordArray = new ArrayList<String>();
+	private static TreeMap<String, Integer> sortedWords;
 
-//		 predictor.frequencyArray = new ArrayList<Integer>();
-			String sql = "SELECT * FROM DICTIONARY";
-			try {
-				connection.execute(sql);
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				return e1.getMessage();
+	public static void main(String args[]) {
+
+	}
+
+	public Main(String connectionString) {
+		JDBCConnection.CONNECTION_STRING = connectionString;
+	}
+
+	public String init(){
+		JDBCConnection connection = new JDBCConnection();
+		wordFrequency = new HashMap<String, Integer>();
+		int frequency;
+		String lemma = "";
+		wordArray = new ArrayList<String>();
+		String sql = "SELECT * FROM DICTIONARY";
+		try {
+			connection.execute(sql);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			return e1.getMessage();
+		}
+		try {
+			while (connection.next()) {
+				frequency = connection.getInt("FREQUENCY");
+				lemma = connection.getString("WORD");
+				this.wordArray.add(lemma);
+				// predictor.frequencyArray.add(frequency);
+				wordFrequency.put(lemma, frequency);
 			}
-			try {
-//				str += "connection done.";
-				while (connection.next()){
-					frequency =connection.getInt("FREQUENCY");
-					lemma = connection.getString("WORD");
-				
-					predictor.wordArray.add(lemma);
-//					predictor.frequencyArray.add(frequency);
-					wordFrequency.put(lemma, frequency);
-//					aux = connection.getString("TABLE_NAME");
-//					str += ".next." + aux;
-//					count ++;
-//					if((count % 4) == 0)
-//						str += "\n";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return e.getMessage();
+		} finally {
+			// predictor.words = new MyTrie<String>();//new
+			// HashMap<Character,ArrayList<String>>//new
+			// HashMap<Character,ArrayList<String>>();
+			if (!this.wordArray.isEmpty()) {
+				wordArry = new String[this.wordArray.size()];
+				// frequencyArry = new Integer[predictor.wordArray.size()];
+				// predictor.frequencyArray.toArray(frequencyArry);
+				this.wordArray.toArray(wordArry);
+				WordFrequencyComparator sortingWords = new WordFrequencyComparator(
+						wordFrequency);
+				sortedWords = new TreeMap<String, Integer>(sortingWords);
+				sortedWords.putAll(wordFrequency);
+				// System.err.println("Completed database part");
+				// end = System.currentTimeMillis();
+				// System.err.println("time::" + (end - start));
+				// PredictionPanel app = PredictionPanel.getMainPanel();
+				try {
+					connection.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					return e.getMessage();
 				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return e.getMessage()+"::"+str;
+				return "database loaded";
 			}
-			finally{
-//				predictor.words = new MyTrie<String>();//new HashMap<Character,ArrayList<String>>//new HashMap<Character,ArrayList<String>>();
-				if(!predictor.wordArray.isEmpty()){
-					wordArry = new String[predictor.wordArray.size()];
-//					frequencyArry = new Integer[predictor.wordArray.size()];
-//					predictor.frequencyArray.toArray(frequencyArry);
-					predictor.wordArray.toArray(wordArry);
-					WordFrequencyComparator sortingWords =  new WordFrequencyComparator(wordFrequency);
-				    sortedWords = new TreeMap<String, Integer>(sortingWords);
-				    sortedWords.putAll(wordFrequency);
-//					System.err.println("Completed database part");
-//					end = System.currentTimeMillis();
-//					System.err.println("time::" + (end - start));
-//					PredictionPanel app = PredictionPanel.getMainPanel();
-				    return "database loaded::";
-				}
-//
-			}
-			return "it should not be here";
-	    }
+			//
+		}
+		return "it should not be here";
+	}
 
 	public static String[] getWordArry() {
 		return wordArry;
 	}
+
 	public static HashMap<String, Integer> getWordFrequency() {
 		return wordFrequency;
 	}
-//	public static Integer[] getFrequencyArry() {
-//		return frequencyArry;
+
+//	public static TreeMap<String, Integer> getSortedWords() {
+//		return sortedWords;
 //	}
-	public static TreeMap<String, Integer> getSortedWords() {
-		return sortedWords;
-	}
-	public static void setSortedWords(TreeMap<String, Integer> sortedWords) {
-		Main.sortedWords = sortedWords;
-	}
+//
+//	public static void setSortedWords(TreeMap<String, Integer> sortedWords) {
+//		Main.sortedWords = sortedWords;
+//	}
 }

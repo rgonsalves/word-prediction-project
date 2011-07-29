@@ -2,6 +2,11 @@ package controller;
 
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,11 +23,11 @@ import utilities.WordFrequencyComparator;
 
 
 
-// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+// @author Santhosh Kumar T - santhosh@in.fiorano.com modified by word-prediction@project.team
 public class AutoCompleter extends CompletionPopUp{ 
 	public static int NUMBER_OF_CHARACTERS_CHECKED = 1;
     public static int MAXIMUM_PREDICTIONS = 8;
-    public static int MAXIMUM_F_KEYS = 13;
+    public static int MAXIMUM_F_KEYS = 12;
     
 	private int wordBegin;
 	private int wordEnd;
@@ -30,7 +35,19 @@ public class AutoCompleter extends CompletionPopUp{
 	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
 	private static final Pattern wordEndPattern = Pattern.compile(Main.WORD_ENDS);// this will find the end of the current word
     
-	public AutoCompleter(){ //for the static methods (js)
+	public static void main (String[] str){
+		Main main = new Main("jdbc:hsqldb:file:/home/aitor/Dropbox/kent/prediction.cp/hsql/words");
+		try {
+			main.init();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String[] result = AutoCompleter.findMatches("d", Main.getWordArry());
+		for (int i=0;i<result.length;i++)
+			System.err.println(result[i]);
+	}
+	
+	public AutoCompleter(){
 		super();
 	}
 	
@@ -70,8 +87,8 @@ public class AutoCompleter extends CompletionPopUp{
      * @param prefix the prefix
      * @return the words list
      */
-	public static String[] findMatches(String prefix){
-	    String [] words = Main.getWordArry();
+	public static String[] findMatches(String prefix, String [] words){
+//	    String [] words = Main.getWordArry();
 //	    Integer[] frequencies = Main.getFrequencyArry();
 	    HashMap<String, Integer> wordFreq = Main.getWordFrequency();
 	    HashMap<String,Integer> wordsForSort = new HashMap<String, Integer>();
@@ -79,15 +96,15 @@ public class AutoCompleter extends CompletionPopUp{
         TreeMap<String, Integer> sortedWords = new TreeMap<String, Integer>(sortingWords);
 	    
 
-	    ArrayList<String> list = new ArrayList<String>();
-		String []retrieved;
+//	    ArrayList<String> list = new ArrayList<String>();
+		String []retrieved = {};
 		int count = 1;
-		if ( words != null && prefix != null){
+		int maxWords = MAXIMUM_F_KEYS > MAXIMUM_PREDICTIONS?MAXIMUM_PREDICTIONS:MAXIMUM_F_KEYS;
+		if ( words != null && prefix != null && wordFreq != null){
 			int pos = Arrays.binarySearch(words, prefix);
 			if( pos < 0 ) { pos = -pos - 1;}
-			while (pos >= 0 && pos < words.length && count < MAXIMUM_F_KEYS) {
+			while (pos >= 0 && pos < words.length/* && count < maxWords*/) {
 				if (words[pos].startsWith(prefix)) {
-//					list.add("F"+(count++) +"..."+words[pos]);
 					wordsForSort.put(words[pos], wordFreq.get(words[pos]));
 				} else {
 					break;
@@ -95,17 +112,15 @@ public class AutoCompleter extends CompletionPopUp{
 				pos++;
 			}
 		}
-		retrieved = new String[wordsForSort.size()];
+		retrieved = new String[maxWords];
 		count = 0;
 		sortedWords.putAll(wordsForSort);
-//		for(int i = 0; (i < sortedWords.size() && i < MAXIMUM_PREDICTIONS) ;i++){
 		for(String word: sortedWords.keySet()){
 			retrieved[count] = "F" + (++count) + "..."+word;//list.get(i);
-			if (count == wordsForSort.size() || count == MAXIMUM_PREDICTIONS)
+			if (count == wordsForSort.size() || count == maxWords)
 				break;
 		}
-	
-		
+
 		return retrieved;
 	}
 	/****
@@ -130,7 +145,7 @@ public class AutoCompleter extends CompletionPopUp{
 		        if(prefix.length() == 0){
 		        	return false;
 		        }
-		        word = findMatches(prefix);
+		        word = findMatches(prefix, Main.getWordArry());
 		        if(word != null && word.length>0){
 		        	list.setListData(word);        	
 		        	return true;

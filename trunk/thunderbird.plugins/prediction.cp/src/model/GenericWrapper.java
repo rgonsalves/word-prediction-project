@@ -27,7 +27,6 @@ public abstract class GenericWrapper {
 
 	protected Log log = LogFactory.getLog(this.getClass());
 	
-	public static 	String CONNECTION_STRING;//	 =		"jdbc:hsqldb:file:c:/hsql/words";//"jdbc:hsqldb:hsql://localhost:9500";//
 	/** Data source JDBC 2.0 */
 	static DataSource m_DataSource;
 	static DataSource m_DataSourceXA;
@@ -52,19 +51,12 @@ public abstract class GenericWrapper {
 	/** Si es true entonces el JDBCWrapper tiene ya una conexion abierta a la base de datos */
 	protected boolean m_IsConnected = false;
 
-	static String m_dataSourceName;
+//	static String m_dataSourceName;
 
 	public GenericWrapper(){
 		
 	}
-	
-//	public GenericWrapper(String dbPath) {
-////		String os = System.getProperty("os.name").toLowerCase();
-////		if (os.indexOf("win") < 0) {//linux
-//////			CONNECTION_STRING = "jdbc:hsqldb:file:words";
-////		}
-//		CONNECTION_STRING = dbPath;
-//	}
+
 
 	/**
 	 * Este m_todo permite preparar la ejecuci_n de una petici_n que cierra eventualmente
@@ -490,7 +482,7 @@ public abstract class GenericWrapper {
 					connProperties.put("autoReconnect", "true");
 					connProperties.put("zeroDateTimeBehavior","convertToNull");
 				
-					m_Connection = DriverManager.getConnection(CONNECTION_STRING,connProperties);
+					m_Connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING,connProperties);
 					m_IsConnected = true;
 //			} catch (SQLException e) {
 //				e.printStackTrace();

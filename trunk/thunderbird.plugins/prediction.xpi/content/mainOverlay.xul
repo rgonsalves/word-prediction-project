@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css"
+  href="chrome://javaDemo/content/button.css"?>
+
+<!DOCTYPE overlay >
+
+
+<overlay id="mainOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/x-javascript">
+		var moduleLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+                       .getService(Components.interfaces.mozIJSSubScriptLoader); 
+		moduleLoader.loadSubScript("chrome://javaDemo/content/global.js");
+		javaConnect.loadJars();
+	</script>
+</overlay>
