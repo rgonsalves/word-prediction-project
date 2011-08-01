@@ -11,6 +11,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 import utilities.WordFrequencyComparator;
+import SpeechRecognition.TextToSpeech;
 
 
 
@@ -82,6 +83,8 @@ public class AutoCompleter extends CompletionPopUp{
 				if (words[pos].startsWith(prefix)) {
 //					list.add("F"+(count++) +"..."+words[pos]);
 					wordsForSort.put(words[pos], wordFreq.get(words[pos]));
+						// speaks the words 
+					TextToSpeech.ConvertTextToSpeech(words[pos]);
 				} else {
 					break;
 				}
