@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.hsqldb.Server;
+
 import model.GenericWrapper;
 import model.JDBCConnection;
 
@@ -35,11 +37,11 @@ public class Main {
 	private static TreeMap<String, Integer> sortedWords;
 
 	public static void main(String args[]) {
-
+		new Main("jdbc:hsqldb:hsql://localhost/wordsdb").init();
 	}
 
-	public Main(String connectionString) {
-		JDBCConnection.CONNECTION_STRING = connectionString;
+	public Main(String fileString) {		
+		org.hsqldb.Server.main(new String[]{"-database.0", fileString, "-dbname.0", "wordsdb"});
 	}
 
 	public String init(){

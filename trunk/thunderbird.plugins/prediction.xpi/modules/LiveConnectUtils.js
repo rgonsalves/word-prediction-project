@@ -41,8 +41,31 @@ function initWithPrivs (java, ext_id, jarFiles) {
 function init (java, ext_id, jarFiles) {
     // SETUP
     JAVA = java;
-    var em = Cc['@mozilla.org/extensions/manager;1'].getService(Ci.nsIExtensionManager);
-    var extDir = em.getInstallLocation(ext_id);
+    var em;
+    var extDir;
+//    if(version < 3.2){
+	    em = Cc['@mozilla.org/extensions/manager;1'].getService(Ci.nsIExtensionManager);
+	    extDir = em.getInstallLocation(ext_id);
+	    /*
+	     * var id = "{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}"; // Adblock Plus
+			var em = Components.classes["@mozilla.org/extensions/manager;1"].
+			  getService(Components.interfaces.nsIExtensionManager);
+			var file = em.getInstallLocacdtion(id).getItemFile(id, "install.rdf");
+			alert(file.path);
+	     */
+//    }
+//    else{
+//    	
+////    	var id = "{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}"; // Adblock Plus
+//			Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
+//			AddonManager.getAddonByID(ext_id, function(aAddon) {
+//			  var file = aAddon.getResourceURI("install.rdf").
+//			    QueryInterface(Components.interfaces.nsIFileURL).file;
+//			  extDir = file.path;
+//			});
+//    	/*
+//    	 */
+//    }
     var fURLs = [];
 
     // ADD

@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  * JDBC actions that extends the generic database actions
  */
 public class JDBCConnection extends GenericWrapper {
-	public static String CONNECTION_STRING;//"jdbc:hsqldb:file:c:/hsql/words";//"jdbc:hsqldb:hsql://localhost:9500";//
+	public static String CONNECTION_STRING = "jdbc:hsqldb:hsql://localhost/wordsdb";//"jdbc:hsqldb:file:c:/hsql/words";//"jdbc:hsqldb:hsql://localhost:9500";//
 
 	private Log log = LogFactory.getLog(this.getClass());
 	/** database connection */
@@ -24,9 +24,9 @@ public class JDBCConnection extends GenericWrapper {
 
 	}
 
-	public JDBCConnection(String connectionString) {
-		CONNECTION_STRING = connectionString;
-	}
+//	public JDBCConnection(String connectionString) {
+//		CONNECTION_STRING = connectionString;
+//	}
 
 	public String closeConnection() {
 		try {

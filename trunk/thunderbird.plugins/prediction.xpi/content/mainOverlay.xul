@@ -8,9 +8,9 @@
 <overlay id="mainOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/x-javascript">
-		var moduleLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+		/*var moduleLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
                        .getService(Components.interfaces.mozIJSSubScriptLoader); 
 		moduleLoader.loadSubScript("chrome://javaDemo/content/global.js");
-		javaConnect.loadJars();
+		javaConnect.loadJars();*/
 	</script>
 </overlay>

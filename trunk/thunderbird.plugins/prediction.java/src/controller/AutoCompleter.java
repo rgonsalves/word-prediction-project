@@ -130,27 +130,27 @@ public class AutoCompleter extends CompletionPopUp{
     protected boolean updateListData(){ 
         String allText = textComp.getText();
         String word[];
-        char lastKey;
+//        char lastKey;
         if(allText.length() == 0){
         	return false;
         }
 
-        lastKey = getLastKey();
+//        lastKey = getLastKey();
 
-        Matcher m = wordSeparatorPattern.matcher(""+lastKey);
+//        Matcher m = wordSeparatorPattern.matcher(""+lastKey);
         
         String prefix = "";
-        if(!m.find()){//if last character input is not a space
-        	    prefix = findCursorWord(allText);//.substring(0, limit));
-		        if(prefix.length() == 0){
-		        	return false;
-		        }
-		        word = findMatches(prefix, Main.getWordArry());
-		        if(word != null && word.length>0){
-		        	list.setListData(word);        	
-		        	return true;
-		        }
+//        if(!m.find()){//if last character input is not an space
+	    prefix = findCursorWord(allText);//.substring(0, limit));
+        if(prefix.length() == 0){
+        	return false;
         }
+        word = findMatches(prefix, Main.getWordArry());
+        if(word != null && word.length>0){
+        	list.setListData(word);        	
+        	return true;
+        }
+//        }
 	    return false;
     } 
  

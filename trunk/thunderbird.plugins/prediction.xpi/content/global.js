@@ -38,34 +38,44 @@ var javaConnect = {
 //	var result1 = mInstance.init(connStr);//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
 //	alert("connection result::" + result1);
 var dbConnection = {
-	main : null,
-	fill : function() {
+	_main : null,
+	_connectionString : "",
+	mainLoad : function(){
 		var file = Components.classes["@mozilla.org/file/directory_service;1"]
 				.getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
 	
 		var path = file.path.replace(/\\/g,"/");
 		path += "/extensions/word-prediction@project.team/content/java/hsql/words";
-		var connStr = "jdbc:hsqldb:file:"+path;
-	
-	//	var reflect = java.lang.reflect;
-	//    var paramtypes = reflect.Array.newInstance(java.lang.Class, 1); 
-		//this even if it seems similar does not work
+		var connStr = "file:"+ path;
+		this._connectionString = connStr;
+		var mainClass = javaConnect.loader.loadClass('controller.Main');
 	    var theClass = java.lang.Class.forName("java.lang.Class");
 		var paramtypes = java.lang.reflect.Array.newInstance(theClass, 1);
 	    var stringClass = java.lang.Class.forName('java.lang.String');
 	
 	    paramtypes[0] = stringClass;
-	    var mainClass = javaConnect.loader.loadClass('controller.Main');
 	
 	    var mConstructor = mainClass.getConstructor(paramtypes);
 	    var theObj = java.lang.Class.forName("java.lang.Object");
 	    var arglist = java.lang.reflect.Array.newInstance(theObj, 1);
 	    arglist[0] = connStr;
 	    
-	    this.main = mConstructor.newInstance(arglist);
+	    this._main = mConstructor.newInstance(arglist);
+	},
+	fill : function() {
+	
+	//	var reflect = java.lang.reflect;
+	//    var paramtypes = reflect.Array.newInstance(java.lang.Class, 1); 
+		//this even if it seems similar does not work
+	    if(!this._main){
+	    	this.mainLoad();
+	    }
 		
-		this.main.init();
-		var result = this.main.init();//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
+		this._main.init();
+		var result = this._main.init();//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
 		alert("connection result::" + result);
+	},
+	destroy : function(){
+		
 	}
 };
