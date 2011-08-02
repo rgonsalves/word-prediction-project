@@ -12,12 +12,11 @@ var javaConnect = {
 		 * alert("methods::"+methodArray);
 		 */
 			Components.utils['import']('resource://javaDemo/LiveConnectUtils.js', this.LiveConnect);
-			var jars = ['URLSetPolicy.jar', 'prediction.jar',
-					'patricia-trie-0.6.jar', 
-					'commons-logging-api-1.1.1.jar', 'hsqldb.jar',
-					'commons-logging-1.1.1.jar', 'RadixTree-0.3.jar'];
+			var jars = ['URLSetPolicy.jar', 'prediction.jar', 'hsqldb.jar',
+					'cmulex.jar', 'en_us.jar',  'freetts.jar','RadixTree-0.3.jar'];
 			[this.loader, this.urls] = this.LiveConnect.initWithPrivs(java,
 					'word-prediction@project.team', jars);
+//			dbConnection.init();
 			alert("jars loaded");
 		
 	}/*,
@@ -37,42 +36,47 @@ var javaConnect = {
 //	var mInstance = mClass.newInstance();
 //	var result1 = mInstance.init(connStr);//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
 //	alert("connection result::" + result1);
+
+//Constructor with parameters
+//var mainClass = javaConnect.loader.loadClass('controller.Main');
+//var theClass = java.lang.Class.forName("java.lang.Class");
+//var paramtypes = java.lang.reflect.Array.newInstance(theClass, 1);
+//var stringClass = java.lang.Class.forName('java.lang.String');
+//paramtypes[0] = stringClass;
+//var mConstructor = mainClass.getConstructor(paramtypes);
+//var theObj = java.lang.Class.forName("java.lang.Object");
+//var arglist = java.lang.reflect.Array.newInstance(theObj, 1);
+//arglist[0] = connStr;
+//this._main = mConstructor.newInstance(arglist);
 var dbConnection = {
 	_main : null,
-	_connectionString : "",
-	mainLoad : function(){
+	loadMain : function(){
+		javaConnect.loadJars();
+		var mClass = javaConnect.loader.loadClass('controller.Main'); 
+		this._main = mClass.newInstance();
+//		var result = this._main.init(connStr);//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
+		alert("mainLoad");
+	    
+	},
+	boot : function() {
+		
 		var file = Components.classes["@mozilla.org/file/directory_service;1"]
 				.getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
 	
 		var path = file.path.replace(/\\/g,"/");
 		path += "/extensions/word-prediction@project.team/content/java/hsql/words";
 		var connStr = "file:"+ path;
-		this._connectionString = connStr;
-		var mainClass = javaConnect.loader.loadClass('controller.Main');
-	    var theClass = java.lang.Class.forName("java.lang.Class");
-		var paramtypes = java.lang.reflect.Array.newInstance(theClass, 1);
-	    var stringClass = java.lang.Class.forName('java.lang.String');
-	
-	    paramtypes[0] = stringClass;
-	
-	    var mConstructor = mainClass.getConstructor(paramtypes);
-	    var theObj = java.lang.Class.forName("java.lang.Object");
-	    var arglist = java.lang.reflect.Array.newInstance(theObj, 1);
-	    arglist[0] = connStr;
-	    
-	    this._main = mConstructor.newInstance(arglist);
+    	this.loadMain();
+    	alert("boot");
+    	this._main.bootDb(connStr);
 	},
-	fill : function() {
-	
-	//	var reflect = java.lang.reflect;
-	//    var paramtypes = reflect.Array.newInstance(java.lang.Class, 1); 
-		//this even if it seems similar does not work
-	    if(!this._main){
-	    	this.mainLoad();
-	    }
-		
-		this._main.init();
-		var result = this._main.init();//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
+	fill: function(){
+		alert("fill");
+		if(!this._main){
+			this.loadMain();
+		}
+//		window.setTimeout(new function(){this._main.bootDb(connStr);},5000);
+		var result = this._main.dbFill();//"jdbc:hsqldb:file:C:/Documents and Settings/Administrator/Application Data/Thunderbird/Profiles/pyp3w7hi.default/extensions/word-prediction@project.team/content/java/hsql/words");//path); 
 		alert("connection result::" + result);
 	},
 	destroy : function(){
