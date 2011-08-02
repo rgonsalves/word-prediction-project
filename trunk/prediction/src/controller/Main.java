@@ -46,7 +46,7 @@ public class Main {
 	public Main(){
 //		start = System.currentTimeMillis();
 		SpeechRecognition.TextToSpeech.ConvertTextToSpeech("hi mam");
-		org.hsqldb.Server.main(new String[]{"-database.0", "file:hsql/words", "-dbname.0", "wordsdb"});
+		org.hsqldb.Server.main(new String[]{"-database.0", "file:hsql/words", "-dbname.0", "Jwordsdb"});
 		try {
 			connection = JDBCWrapper.getConnectionInstance();
 		} catch (Exception e) {

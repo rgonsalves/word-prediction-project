@@ -10,9 +10,9 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
+import utilities.TextToVoice;
 import SpeechRecognition.TextToSpeechController;
 
-import utilities.TextToVoice;
 import utilities.WordFrequencyComparator;
 
 
@@ -62,7 +62,8 @@ public class AutoCompleter extends CompletionPopUp{
     		if (len >= 2)
     			word = text.substring(wordEndPos.get(len - 2), wordEndPos.get(len - 1));
     		if(Main.SPEECH_WORD)
-    			TextToVoice.speech(word);
+    			utilities.TextToVoice.speech(word);
+    		
     	}
     		
     	 Matcher m2 = wordEndPattern.matcher(text.substring(wordBegin, text.length()));
