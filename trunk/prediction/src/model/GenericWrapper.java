@@ -27,7 +27,7 @@ public abstract class GenericWrapper {
 
 	protected Log log = LogFactory.getLog(this.getClass());
 	
-	static 	String CONNECTION_STRING	 =		"jdbc:hsqldb:hsql://localhost:9500";//"jdbc:mysql://localhost:3306/wordnet30";
+	static 	String CONNECTION_STRING	 =		"jdbc:hsqldb:hsql://localhost/wordsdb";//"jdbc:hsqldb:hsql://localhost:9500";//"jdbc:mysql://localhost:3306/wordnet30";
 	/** Data source JDBC 2.0 */
 	static DataSource m_DataSource;
 	static DataSource m_DataSourceXA;

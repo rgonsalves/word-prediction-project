@@ -10,8 +10,11 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
+import SpeechRecognition.TextToSpeechController;
+
+import utilities.TextToVoice;
 import utilities.WordFrequencyComparator;
-import SpeechRecognition.TextToSpeech;
+
 
 
 
@@ -27,9 +30,10 @@ public class AutoCompleter extends CompletionPopUp{
 	private String selectedWord;
 	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
 	private static final Pattern wordEndPattern = Pattern.compile(Main.WORD_ENDS);// this will find the end of the current word
-    
+    private TextToSpeechController speech;
 	public AutoCompleter(JTextComponent comp){ 
         super(comp);
+        speech = new TextToSpeechController(); 
     } 
  
     /***
@@ -37,7 +41,7 @@ public class AutoCompleter extends CompletionPopUp{
      * @param text all the input text
      * @return the last word
      */
-    private String findCursorWord(String text){
+	private String findCursorWord(String text){
     	int cursorPos =textComp.getCaret().getDot();//cursor position
     	if(text.length() < cursorPos) //if the user is removing characters
     		cursorPos = text.length();
@@ -46,9 +50,21 @@ public class AutoCompleter extends CompletionPopUp{
     	int prefixEnd = cursorPos;
     	wordBegin = 0;
     	wordEnd = 1;
+    	ArrayList<Integer> wordEndPos = new ArrayList<Integer>();
+    	wordEndPos.add(0);
     	while(m1.find()){	// to find the word where the cursor is in
     		 wordBegin = m1.end();
+    		 wordEndPos.add(wordBegin);
      	 }
+    	if(wordBegin == prefixEnd){// word completed
+    		int len = wordEndPos.size();
+    		String word = "";
+    		if (len >= 2)
+    			word = text.substring(wordEndPos.get(len - 2), wordEndPos.get(len - 1));
+    		if(Main.SPEECH_WORD)
+    			TextToVoice.speech(word);
+    	}
+    		
     	 Matcher m2 = wordEndPattern.matcher(text.substring(wordBegin, text.length()));
     	 while(m2.find()) // to find the end of the current word, the word where the cursor is in
     		 wordEnd = wordBegin + m2.start();
@@ -84,7 +100,7 @@ public class AutoCompleter extends CompletionPopUp{
 //					list.add("F"+(count++) +"..."+words[pos]);
 					wordsForSort.put(words[pos], wordFreq.get(words[pos]));
 						// speaks the words 
-					TextToSpeech.ConvertTextToSpeech(words[pos]);
+//					TextToSpeech.ConvertTextToSpeech(words[pos]);
 				} else {
 					break;
 				}

@@ -37,11 +37,16 @@ public class Main {
 	private static String[] wordArry;
     private static TreeMap<String, Integer> sortedWords;
 	
-	
+//    public static boolean SPEECH = true;
+    public static boolean SPEECH_WORD = true;
+    public static boolean SPEECH_TEXT = false;
+	public static boolean SPEECH_FULLTEXT = false;
 	
 	
 	public Main(){
 //		start = System.currentTimeMillis();
+		SpeechRecognition.TextToSpeech.ConvertTextToSpeech("hi mam");
+		org.hsqldb.Server.main(new String[]{"-database.0", "file:hsql/words", "-dbname.0", "wordsdb"});
 		try {
 			connection = JDBCWrapper.getConnectionInstance();
 		} catch (Exception e) {
