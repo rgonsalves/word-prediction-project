@@ -33,7 +33,6 @@ public class AutoCompleter extends CompletionPopUp{
     private TextToSpeechController speech;
 	public AutoCompleter(JTextComponent comp){ 
         super(comp);
-        speech = new TextToSpeechController(); 
     } 
  
     /***
@@ -143,7 +142,7 @@ public class AutoCompleter extends CompletionPopUp{
 		        if(prefix.length() == 0){
 		        	return false;
 		        }
-		        word = findMatches(prefix);
+		        word = findMatches(prefix.toLowerCase());
 		        if(word != null && word.length>0){
 		        	list.setListData(word);        	
 		        	return true;

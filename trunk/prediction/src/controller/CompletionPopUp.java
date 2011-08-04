@@ -50,7 +50,7 @@ public abstract class CompletionPopUp{
 	        scroll.setBorder(null); 
 	 
 	        list.setFocusable( false );
-	        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 	        scroll.getVerticalScrollBar().setFocusable( false ); 
 	        scroll.getHorizontalScrollBar().setFocusable( false ); 
 	 

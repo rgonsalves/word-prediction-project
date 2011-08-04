@@ -17,7 +17,7 @@ import model.JDBCWrapper;
 
 import ds.tree.RadixTree;
 
-//import model.JDBCWrapper;
+import org.hsqldb.*;
 
 import utilities.MyTrie;
 import utilities.WordFrequencyComparator;
@@ -26,8 +26,7 @@ import view.PredictionPanel;
 
 public class Main {
 	private static JDBCWrapper connection;
-//	public static final char[] SEPARATORS={'\\s',',','.',';'};
-	public static final String WORD_SEPARATORS = "[\\s,.;]";
+	public static final String WORD_SEPARATORS = "[\\s,'.',;!?\"]";
 	public static final String WORD_ENDS = "[\\W]";
 //	private MyTrie<String> words;//HashMap<Character,ArrayList<String>> words;
 	private ArrayList<String> wordArray;
@@ -37,24 +36,35 @@ public class Main {
 	private static String[] wordArry;
     private static TreeMap<String, Integer> sortedWords;
 	
-//    public static boolean SPEECH = true;
+
     public static boolean SPEECH_WORD = true;
     public static boolean SPEECH_TEXT = false;
 	public static boolean SPEECH_FULLTEXT = false;
 	
 	
+	
 	public Main(){
-//		start = System.currentTimeMillis();
-		SpeechRecognition.TextToSpeech.ConvertTextToSpeech("hi mam");
-		org.hsqldb.Server.main(new String[]{"-database.0", "file:hsql/words", "-dbname.0", "Jwordsdb"});
+		bootDb();
+//		Server.main(new String[]{"-database.0", "file:hsql/words", "-dbname.0", "Jwordsdb"});
+	
 		try {
 			connection = JDBCWrapper.getConnectionInstance();
+			connection.setAutoCommit(true);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		wordFrequency = new HashMap<String, Integer>();
 		
+	}
+	public static void bootDb(){
+		Server db = new Server();
+
+		db.setDatabaseName(0, "database");
+		db.setDatabasePath(0, "file:hsql/words");
+		if(db.getState() != ServerConstants.SERVER_STATE_SHUTDOWN)
+			db.shutdown();
+		db.setRestartOnShutdown(true);
+		db.start();
 	}
 	 public static void main(String args[]) {
 		 Main predictor = new Main();
@@ -67,7 +77,6 @@ public class Main {
 			try {
 				connection.execute(sql);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			try {
@@ -108,9 +117,6 @@ public class Main {
 	public static HashMap<String, Integer> getWordFrequency() {
 		return wordFrequency;
 	}
-//	public static Integer[] getFrequencyArry() {
-//		return frequencyArry;
-//	}
 	public static TreeMap<String, Integer> getSortedWords() {
 		return sortedWords;
 	}
