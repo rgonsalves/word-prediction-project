@@ -1,5 +1,5 @@
 // See http://kb.mozillazine.org/Localize_extension_descriptions
-pref('extensions.javaDemo.description', 'chrome://javaDemo/locale/javaDemo.properties');
+pref('extensions.javaDemo.description', 'chrome://prediction/locale/javaDemo.properties');
 
 /*
 // Examples

@@ -1,13 +1,23 @@
 var EXPORTED_SYMBOLS = [
-    'init',
-    'initWithPrivs',
-    'policyAdd'
+    'boot',
+    'loader','urls'
 ];
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 var JAVA;
+var loader;
 
+function boot(java){
+	var jars = ['URLSetPolicy.jar', 'hsqldb.jar', 
+			'prediction.jar'//, 
+		//	'cmu_time_awb.jar','cmu_us_kal.jar','cmudict04.jar','cmulex.jar','cmutimelex.jar','en_us.jar','freetts.jar','mbrola.jar'//speech
+			];
+	var wm = Cc['@mozilla.org/appshell/window-mediator;1'].getService(Ci.nsIWindowMediator);
+    var mainWin = wm.getMostRecentWindow('navigator:browser');
+
+	[loader,urls] =  initWithPrivs(java || mainWin.java,'word-prediction@project.team', jars);
+}
 // For more background on the code used here, see http://forums.java.net/jive/thread.jspa?threadID=45933&tstart=0
 
 /**
@@ -40,32 +50,9 @@ function initWithPrivs (java, ext_id, jarFiles) {
  */
 function init (java, ext_id, jarFiles) {
     // SETUP
-    JAVA = java;
-    var em;
-    var extDir;
-//    if(version < 3.2){
-	    em = Cc['@mozilla.org/extensions/manager;1'].getService(Ci.nsIExtensionManager);
-	    extDir = em.getInstallLocation(ext_id);
-	    /*
-	     * var id = "{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}"; // Adblock Plus
-			var em = Components.classes["@mozilla.org/extensions/manager;1"].
-			  getService(Components.interfaces.nsIExtensionManager);
-			var file = em.getInstallLocacdtion(id).getItemFile(id, "install.rdf");
-			alert(file.path);
-	     */
-//    }
-//    else{
-//    	
-////    	var id = "{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}"; // Adblock Plus
-//			Components.utils.import("resource://gre/modules/AddonManager.jsm"); 
-//			AddonManager.getAddonByID(ext_id, function(aAddon) {
-//			  var file = aAddon.getResourceURI("install.rdf").
-//			    QueryInterface(Components.interfaces.nsIFileURL).file;
-//			  extDir = file.path;
-//			});
-//    	/*
-//    	 */
-//    }
+	 JAVA = java;
+    var em = Cc['@mozilla.org/extensions/manager;1'].getService(Ci.nsIExtensionManager);
+    var extDir = em.getInstallLocation(ext_id);
     var fURLs = [];
 
     // ADD

@@ -8,7 +8,6 @@ import java.util.LinkedList;
 
 import controller.Main;
 
-import model.GenericWrapper;
 import model.JDBCWrapper;
 import model.NgramsDAO;
 

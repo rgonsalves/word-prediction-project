@@ -12,8 +12,10 @@ var javaConnect = {
 		 * alert("methods::"+methodArray);
 		 */
 			Components.utils['import']('resource://javaDemo/LiveConnectUtils.js', this.LiveConnect);
-			var jars = ['URLSetPolicy.jar', 'prediction.jar', 'hsqldb.jar',
-					'cmulex.jar', 'en_us.jar',  'freetts.jar','RadixTree-0.3.jar'];
+			var jars = ['URLSetPolicy.jar', 'hsqldb.jar', 'RadixTree-0.3.jar',
+					'prediction.jar', 
+					'cmu_time_awb.jar','cmu_us_kal.jar','cmudict04.jar','cmulex.jar','cmutimelex.jar','en_us.jar','freetts.jar','mbrola.jar'//speech
+					];
 			[this.loader, this.urls] = this.LiveConnect.initWithPrivs(java,
 					'word-prediction@project.team', jars);
 //			dbConnection.init();

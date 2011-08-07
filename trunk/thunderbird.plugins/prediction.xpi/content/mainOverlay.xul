@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css"
-  href="chrome://javaDemo/content/button.css"?>
+  href="chrome://prediction/content/button.css"?>
 
 <!DOCTYPE overlay >
 
@@ -8,9 +8,12 @@
 <overlay id="mainOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/x-javascript">
-		var moduleLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+		/*var moduleLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
                        .getService(Components.interfaces.mozIJSSubScriptLoader); 
-		moduleLoader.loadSubScript("chrome://javaDemo/content/global.js");
-		dbConnection.boot();
+		moduleLoader.loadSubScript("chrome://prediction/content/global.js");
+		dbConnection.boot();*/
+		var LiveConnect = {};
+		Components.utils['import']('resource://prediction/LiveConnectUtils.js', LiveConnect);
+		LiveConnect.boot(java);
 	</script>
 </overlay>

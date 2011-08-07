@@ -11,7 +11,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 import utilities.TextToVoice;
-import SpeechRecognition.TextToSpeechController;
+//import SpeechRecognition.TextToSpeechController;
 
 import utilities.WordFrequencyComparator;
 
@@ -30,7 +30,7 @@ public class AutoCompleter extends CompletionPopUp{
 	private String selectedWord;
 	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
 	private static final Pattern wordEndPattern = Pattern.compile(Main.WORD_ENDS);// this will find the end of the current word
-    private TextToSpeechController speech;
+//    private TextToSpeechController speech;
 	public AutoCompleter(JTextComponent comp){ 
         super(comp);
     } 

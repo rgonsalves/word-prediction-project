@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css"
-  href="chrome://javaDemo/content/button.css"?>
+  href="chrome://prediction/content/button.css"?>
 
 <!DOCTYPE overlay >
 
 
 <overlay id="msgComp-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-	<script type="application/x-javascript" src="chrome://javaDemo/content/overlay.js"/>
+	<script type="application/x-javascript" src="chrome://prediction/content/overlay.js"/>
 	
 </overlay>
