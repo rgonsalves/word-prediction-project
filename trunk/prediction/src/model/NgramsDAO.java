@@ -75,18 +75,15 @@ public class NgramsDAO {
 		else
 			while (connection.next()) {
 				ngram = NgramVO.getNgramDb(connection);
-				if (ngram.getPattern() == null || ngram.getWord() == null
-						|| ngram.getReceiver() == null) {
+				if (ngram.getPattern() != pattern || ngram.getWord() != word
+						|| ngram.getReceiver() != receiver) {
 					insertDbLine(n, pattern, word, 1, receiver);
 				} else {
 					if (ngram.getPattern() == pattern
 							&& ngram.getWord() == word
 							&& ngram.getReceiver() == receiver) {
 						updateDbFrequency(ngram.getFrequency() + 1, ngram.getId());
-					} else if (ngram.getPattern() == pattern
-							&& ngram.getWord() == word
-							&& ngram.getReceiver() != receiver)
-						insertDbLine(n, pattern, word, 1, receiver);
+					} 
 				}
 			}
 	}
