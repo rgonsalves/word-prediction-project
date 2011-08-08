@@ -57,22 +57,24 @@ public class Ngrams {
 		count++;
 //		receiver = cleanWords(new String[]{receiver})[0];
 		NgramsDAO ngramDao = NgramsDAO.getInstance();
-		ngramDao.insertDbLine(1, "", "", 0, "");
+//		ngramDao.insertDbLine(1, "", "", 0, "");
 		for (int n = 0; n < words.length; n++) {
-			String[] patterns = words[n].split(" ");
-			String pattern = words[n].substring(0, words[n].length() - 1
-					- patterns[patterns.length - 1].length());
-			
-			System.out.println(words[n] + " the pattern :" + pattern + " the word : "
-					+ patterns[patterns.length - 1]);
-			String[] strWOapostrophes = NgramsDAO.cleanWords(new String[]{pattern, patterns[patterns.length - 1]});
-			pattern = strWOapostrophes[0];
-			word = strWOapostrophes[1];
-			try {
-				ngramDao.getNgrams(pattern, word, receiver, count);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			String[] patterns = words[n].split(Main.WORD_SEPARATORS);
+			if(patterns.length > 0){
+				String pattern = words[n].substring(0, words[n].length() - 1
+						- patterns[patterns.length - 1].length());
+				
+				System.out.println(words[n] + " the pattern :" + pattern + " the word : "
+						+ patterns[patterns.length - 1]);
+				String[] strWOapostrophes = NgramsDAO.cleanWords(new String[]{pattern, patterns[patterns.length - 1]});
+				pattern = strWOapostrophes[0];
+				word = strWOapostrophes[1];
+				try {
+					ngramDao.getNgrams(pattern, word, receiver, count);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -95,7 +97,7 @@ public class Ngrams {
 	}
 
 	public static String[] ngrams(String s, int len) {
-		String[] parts = s.split(" ");
+		String[] parts = s.split(Main.WORD_SEPARATORS);
 		String[] result = new String[parts.length - len + 1];
 		for (int i = 0; i < parts.length - len + 1; i++) {
 			StringBuilder sb = new StringBuilder();

@@ -36,8 +36,8 @@ public class NgramsDAO {
 	public static String[] cleanWords(String[] words){
 		String[] result = new String[words.length];
 		for(int i=0;i<words.length;i++){
-			result[i] = words[i].replaceAll(Main.WORD_SEPARATORS2, "");
-			result[i] = result[i].replaceAll("'", "''");
+//			result[i] = words[i].replaceAll(Main.WORD_SEPARATORS, "");
+			result[i] = words[i].replaceAll("'", "''");
 			
 		}
 		return result;

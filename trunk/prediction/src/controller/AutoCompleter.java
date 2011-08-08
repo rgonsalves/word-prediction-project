@@ -28,7 +28,7 @@ public class AutoCompleter extends CompletionPopUp{
 	private int wordBegin;
 	private int wordEnd;
 	private String selectedWord;
-	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS2);// this will check if any word termination character, ",.; " exists in the input text
+	private static final Pattern wordSeparatorPattern = Pattern.compile(Main.WORD_SEPARATORS);// this will check if any word termination character, ",.; " exists in the input text
 	private static final Pattern wordEndPattern = Pattern.compile(Main.WORD_ENDS);// this will find the end of the current word
 //    private TextToSpeechController speech;
 	public AutoCompleter(JTextComponent comp){ 

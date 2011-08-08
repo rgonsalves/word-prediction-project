@@ -26,14 +26,11 @@ import view.PredictionPanel;
 
 public class Main {
 	private static JDBCWrapper connection;
-	public static final String WORD_SEPARATORS2 = "[\\s,'.',;!?\"]";
-	public static final String WORD_SEPARATORS = "['.',;!?\"]";
+	public static final String WORD_SEPARATORS = "[\\s'.',;!'?'\"()-]";
 	public static final String WORD_ENDS = "[\\W]";
-//	private MyTrie<String> words;//HashMap<Character,ArrayList<String>> words;
 	private ArrayList<String> wordArray;
 	private ArrayList<Integer> frequencyArray;
 	private static HashMap<String, Integer> wordFrequency;
-//	private static Integer[] frequencyArry;
 	private static String[] wordArry;
     private static TreeMap<String, Integer> sortedWords;
 	
