@@ -2,6 +2,7 @@ package model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -57,5 +58,17 @@ public class JDBCWrapper extends GenericWrapper{
 			}
 		}
 		return m_Connection;
+	}
+	
+	protected ResultSet getResultSet(){
+		return m_Rset;
+	}
+	protected int getRowsNumber() throws SQLException{
+		int number;
+		int actual = m_Rset.getRow();
+		m_Rset.last();
+		number = m_Rset.getRow();
+		m_Rset.absolute(actual);
+		return number;
 	}
 }

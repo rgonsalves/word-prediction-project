@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import controller.Main;
 
 import model.JDBCWrapper;
+import model.NgramVO;
 import model.NgramsDAO;
 
 
@@ -23,21 +24,13 @@ public class Ngrams {
 	public Ngrams() throws Exception{
 		Main.bootDb();
 	}
-	private String[] cleanWords(String[] words){
-		String[] result = new String[words.length];
-		for(int i=0;i<words.length;i++){
-			result[i] = words[i].replaceAll(Main.WORD_SEPARATORS2, "");
-			result[i] = result[i].replaceAll("'", "''");
-			
-		}
-		return result;
-	}
+	
 	
 	void buildNgrams() throws Exception {
 		String receiver = "";
 		String word = "";
 		String sql;
-		NgramsDAO ngramDao = NgramsDAO.getInstance();
+		
 //		ngramDao.fillEmptyNgram();
 		String contents = readFileAsString("A Maze Of Death v1.0.txt");
 		LinkedList<String[]> l = new LinkedList<String[]>();
@@ -49,30 +42,41 @@ public class Ngrams {
 		l.add(a2);
 		l.add(a3);
 		l.add(a4);
+		int n = 1;
+		
+		
+		for (String[] words : l) {
+			fillTable(words);
+			n ++;
+		}
+	}
+	public void fillTable(String[] words) throws Exception{
+		String word;
+		String receiver = "";
 		int count = 0;
-		receiver = cleanWords(new String[]{receiver})[0];
-		for (String[] w : l) {
-			count++;
-			for (int n = 0; n < w.length; n++) {
-				String[] pattern = w[n].split(" ");
-				String p = w[n].substring(0, w[n].length() - 1
-						- pattern[pattern.length - 1].length());
-				
-				System.out.println(w[n] + " the pattern :" + p + " the word : "
-						+ pattern[pattern.length - 1]);
-				String[] strWOapostrophes = cleanWords(new String[]{p, pattern[pattern.length - 1]});
-				p = strWOapostrophes[0];
-				word = strWOapostrophes[1];
-				try {
-					ngramDao.getNgrams(p, word, receiver, count);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		count++;
+//		receiver = cleanWords(new String[]{receiver})[0];
+		NgramsDAO ngramDao = NgramsDAO.getInstance();
+		ngramDao.insertDbLine(1, "", "", 0, "");
+		for (int n = 0; n < words.length; n++) {
+			String[] patterns = words[n].split(" ");
+			String pattern = words[n].substring(0, words[n].length() - 1
+					- patterns[patterns.length - 1].length());
+			
+			System.out.println(words[n] + " the pattern :" + pattern + " the word : "
+					+ patterns[patterns.length - 1]);
+			String[] strWOapostrophes = NgramsDAO.cleanWords(new String[]{pattern, patterns[patterns.length - 1]});
+			pattern = strWOapostrophes[0];
+			word = strWOapostrophes[1];
+			try {
+				ngramDao.getNgrams(pattern, word, receiver, count);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
-
+	
 	private static String readFileAsString(String filePath)
 			throws java.io.IOException {
 		byte[] buffer = new byte[(int) new File(filePath).length()];

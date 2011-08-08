@@ -35,6 +35,7 @@ public abstract class GenericWrapper {
 	/** Recordset with all the query data */
 	protected ResultSet m_Rset;
 
+//	protected int rowsNumber = 0;
 	/** non query result data */
 	public int NonQueryResult =0;
 
@@ -180,8 +181,12 @@ public abstract class GenericWrapper {
 	public void execute(String sql) throws Exception {
 		try {
 			beforeExecute();
-			m_Prep = getConnection().prepareStatement(sql);
+			m_Prep = getConnection().prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
 			m_Rset = m_Prep.executeQuery();
+//			m_Rset.last();
+//			rowsNumber = m_Rset.getRow();
+//			m_Rset.first();
 		}
 		catch (SQLException e) {
 			String message = e.getMessage();

@@ -1,5 +1,6 @@
 package model;
 
+import controller.Main;
 
 public class NgramsDAO {
 
@@ -31,20 +32,31 @@ public class NgramsDAO {
 		}
 		return instance;
 	}
+
+	public static String[] cleanWords(String[] words){
+		String[] result = new String[words.length];
+		for(int i=0;i<words.length;i++){
+			result[i] = words[i].replaceAll(Main.WORD_SEPARATORS2, "");
+			result[i] = result[i].replaceAll("'", "''");
+			
+		}
+		return result;
+	}
 	
-	public void clearNgrams() throws Exception{
-		for (int i=1;i<7;i++)
+
+	public void clearNgrams() throws Exception {
+		for (int i = 1; i < 7; i++)
 			clearNgrams(i);
 	}
 
-	public void clearNgrams(int n) throws Exception{
-		String sql ="";
+	public void clearNgrams(int n) throws Exception {
+		String sql = "";
 		sql = "DELETE FROM NGRAM_" + n;
 		connection.dmlExecute(sql);
 	}
 
-	private void insertDbLine(int n, String pattern, String word,
-			int frequency, String receiver) throws Exception {
+	public void insertDbLine(int n, String pattern, String word, int frequency,
+			String receiver) throws Exception {
 		String sql = " INSERT INTO NGRAM_" + n
 				+ " (PATTERN, WORD, FREQUENCY, RECEIVER) VALUES ('" + pattern
 				+ "' ," + "'" + word + "', " + frequency + ", '" + receiver
@@ -59,32 +71,29 @@ public class NgramsDAO {
 		connection.execute(sql);
 	}
 
-	private void updateDbFrequency(int frequency, int id) throws Exception{
-		String sql = " UPDATE FREQUENCY SET "
-				+ (frequency) + " WHERE ID =" + id;
+	private void updateDbFrequency(int n, int frequency, int id) throws Exception {
+		String sql = " UPDATE NGRAM_" + n + " SET FREQUENCY=" + (frequency) + " WHERE ID ="
+				+ id;
 		connection.dmlExecute(sql);
 	}
+
 	public void getNgrams(String pattern, String word, String receiver, int n)
 			throws Exception {
 		NgramVO ngram = new NgramVO();
 		int frequency = 0;
 		checkDbLine(n, pattern, word, frequency, receiver);
-
-		if (!connection.next())
-			insertDbLine(n, pattern, word, frequency, receiver);
-		else
-			while (connection.next()) {
-				ngram = NgramVO.getNgramDb(connection);
-				if (ngram.getPattern() != pattern || ngram.getWord() != word
-						|| ngram.getReceiver() != receiver) {
-					insertDbLine(n, pattern, word, 1, receiver);
-				} else {
-					if (ngram.getPattern() == pattern
-							&& ngram.getWord() == word
-							&& ngram.getReceiver() == receiver) {
-						updateDbFrequency(ngram.getFrequency() + 1, ngram.getId());
-					} 
+		if(connection.getRowsNumber() > 0){
+			ngram = NgramVO.getNgramDb(connection);
+			if (!ngram.getPattern().equals(pattern) || !ngram.getWord().equals(word)
+					|| !ngram.getReceiver().equals(receiver)) {
+				insertDbLine(n, pattern, word, 1, receiver);
+			} else {
+				if (ngram.getPattern().equals(pattern) && ngram.getWord().equals(word)
+						&& ngram.getReceiver().equals(receiver)) {
+					updateDbFrequency(n, ngram.getFrequency() + 1, ngram.getId());
 				}
 			}
+		} else insertDbLine(n, pattern, word, 1, receiver);
+
 	}
 }
