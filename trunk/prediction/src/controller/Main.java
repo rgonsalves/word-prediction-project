@@ -26,7 +26,9 @@ import view.PredictionPanel;
 
 public class Main {
 	private static JDBCWrapper connection;
-	public static final String WORD_SEPARATORS = "[\\s'.',;!'?'\"()-]";
+	public static final String WORD_SEPARATORS = "[\\s'.',;!'?'\"()-$]";
+//	public static final String SPACEANDRETURN_ERASER = "[\\s$]";
+	public static final String WORD_S = "[' '$]";
 	public static final String WORD_ENDS = "[\\W]";
 	private ArrayList<String> wordArray;
 	private ArrayList<Integer> frequencyArray;
