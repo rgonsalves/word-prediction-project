@@ -26,9 +26,7 @@ import view.PredictionPanel;
 
 public class Main {
 	private static JDBCWrapper connection;
-	public static final String WORD_SEPARATORS = "[\\s'.'','';''!''?'\"'('')'-'$]";
-//	public static final String SPACEANDRETURN_ERASER = "[\\s$]";
-	public static final String WORD_S = "[' '$]";
+	public static final String WORD_SEPARATORS = "[\\s'.'','';''!''?'\"()-]";
 	public static final String WORD_ENDS = "[\\W]";
 	private ArrayList<String> wordArray;
 	private ArrayList<Integer> frequencyArray;
@@ -43,9 +41,11 @@ public class Main {
 	public static Server db;
 	
 	
+	
 	public Main(){
 		bootDb();
 //		Server.main(new String[]{"-database.0", "file:hsql/words", "-dbname.0", "Jwordsdb"});
+	
 		try {
 			connection = JDBCWrapper.getConnectionInstance();
 			connection.setAutoCommit(true);
@@ -55,18 +55,17 @@ public class Main {
 		wordFrequency = new HashMap<String, Integer>();
 		
 	}
+	
 	public static void closeDb() throws Exception{
 		db.shutdown();
 	}
+	
 	public static void bootDb(){
-
 		db = new Server();
 		db.setDatabaseName(0, "database");
 		db.setDatabasePath(0, "file:hsql/words");
 		db.setRestartOnShutdown(true);
-//		if(db.getState() != ServerConstants.SERVER_STATE_ONLINE){
-			db.start();
-//		}
+		db.start();
 	}
 	 public static void main(String args[]) {
 		 Main predictor = new Main();
@@ -125,4 +124,6 @@ public class Main {
 	public static void setSortedWords(TreeMap<String, Integer> sortedWords) {
 		Main.sortedWords = sortedWords;
 	}
+
+	
 }

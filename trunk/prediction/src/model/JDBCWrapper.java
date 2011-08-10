@@ -60,9 +60,6 @@ public class JDBCWrapper extends GenericWrapper{
 		return m_Connection;
 	}
 	
-//	protected ResultSet getResultSet(){
-//		return m_Rset;
-//	}
 	protected int getRowsNumber(){
 		return qRowsNumber;
 	}
