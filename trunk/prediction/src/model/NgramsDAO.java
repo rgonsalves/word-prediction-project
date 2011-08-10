@@ -46,12 +46,12 @@ public class NgramsDAO {
 	}
 	
 
-	public void clearNgrams() throws Exception {
+	public static void clearNgrams() throws Exception {
 		for (int i = 1; i < 7; i++)
 			clearNgrams(i);
 	}
 
-	public void clearNgrams(int n) throws Exception {
+	public static void clearNgrams(int n) throws Exception {
 		String sql = "";
 		sql = "DELETE FROM NGRAM_" + n;
 		connection.execute(sql);
@@ -78,8 +78,9 @@ public class NgramsDAO {
 				+ pattern + "' AND RECEIVER ='" + receiver +"'";
 		connection.executeQuery(sql);
 		NgramVO ngram =null;
-		LinkedList<String> list = new LinkedList<String>();
+		LinkedList<String> list = null;
 		if(connection.getRowsNumber() > 0){
+			list = new LinkedList<String>();
 			while(connection.next()){
 				ngram = NgramVO.getNgramDb(connection);
 				list.add(ngram.getWord());

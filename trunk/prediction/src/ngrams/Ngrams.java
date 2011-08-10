@@ -27,7 +27,7 @@ public class Ngrams {
 		Main.bootDb();
 	}
 
-	public void buildNgrams() throws Exception {
+	public static void buildNgrams() throws Exception {
 		String receiver = "";
 		String word = "";
 		String sql;
@@ -52,40 +52,31 @@ public class Ngrams {
 		}
 	}
 
-	private String preproc(String s) {
+	private static String preproc(String s) {
 		if (s.charAt(0) == '\t' || s.charAt(0) == ' ') {
 			s = s.substring(1);
 		}
-		// int index = s.indexOf("  ");
-		// while(index != -1)
-		// {
+
 		s = s.replaceAll("'.'", ". ");
 		s = s.replaceAll(",", ", ");
 		s = s.replaceAll("'?'", "? ");
 		s = s.replaceAll(";", "; ");
 		s = s.replaceAll("!", "! ");
-		s = s.replaceAll("\\s\\s+", " ");
-		s = s.replaceAll("\\t+", " ");
-		// index = s.indexOf("  ");
-		// }
+		s = s.replaceAll("\\s\\s+|\\t+", " ");
+//		s = s.replaceAll("\\t+", " ");
+		
 		return s;
 	}
 
-	public void fillTable(String[] words, int tableN) throws Exception {
+	public static void fillTable(String[] words, int tableN) throws Exception {
 		String word;
 		String receiver = "";
-
-		// receiver = cleanWords(new String[]{receiver})[0];
 		NgramsDAO ngramDao = NgramsDAO.getInstance();
-		// ngramDao.insertDbLine(1, "", "", 0, "");
 		for (int n = 0; n < words.length; n++) {
 			String[] patterns = words[n].split(" ");
 			if (patterns.length > 1) {
 				String pattern = words[n].substring(0, words[n].length() - 1
 						- patterns[patterns.length - 1].length());
-
-//				System.out.println("sentence:: " +words[n] + "  pattern:" + pattern
-//						+ "--word:" + patterns[patterns.length - 1]);
 				String[] strWOapostrophes = NgramsDAO.cleanWords(new String[] {
 						pattern, patterns[patterns.length - 1] });
 				pattern = strWOapostrophes[0];
