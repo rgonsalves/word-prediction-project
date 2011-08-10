@@ -35,7 +35,7 @@ public abstract class GenericWrapper {
 	/** Recordset with all the query data */
 	protected ResultSet m_Rset;
 
-//	protected int rowsNumber = 0;
+	protected int qRowsNumber = 0;
 	/** non query result data */
 	public int NonQueryResult =0;
 
@@ -132,7 +132,7 @@ public abstract class GenericWrapper {
 	 * @param sql quey
 	 * @exception Exception
 	 */
-	public void dmlExecute(String sql) throws Exception {
+	public void execute(String sql) throws Exception {
 		try {
 			beforeExecute();
 			m_Prep = getConnection().prepareStatement(sql);
@@ -178,15 +178,15 @@ public abstract class GenericWrapper {
 	 * @param sql quey
 	 * @exception Exception
 	 */
-	public void execute(String sql) throws Exception {
+	public void executeQuery(String sql) throws Exception {
 		try {
 			beforeExecute();
 			m_Prep = getConnection().prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
 			m_Rset = m_Prep.executeQuery();
-//			m_Rset.last();
-//			rowsNumber = m_Rset.getRow();
-//			m_Rset.first();
+			m_Rset.last();
+			qRowsNumber = m_Rset.getRow();
+			m_Rset.beforeFirst();
 		}
 		catch (SQLException e) {
 			String message = e.getMessage();

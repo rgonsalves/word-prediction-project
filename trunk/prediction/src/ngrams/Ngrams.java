@@ -16,22 +16,24 @@ public class Ngrams {
 	private JDBCWrapper connection;
 
 	public static void main(String[] args) throws Exception {
-		ngrams.Ngrams _ngrams = new Ngrams();
+		Main.bootDb();
+		ngrams.Ngrams ngrams = new Ngrams();
 		NgramsDAO.getInstance().clearNgrams();
-		_ngrams.buildNgrams();
+		ngrams.buildNgrams();
+		Main.closeDb();
 	}
 
 	public Ngrams() throws Exception {
 		Main.bootDb();
 	}
 
-	void buildNgrams() throws Exception {
+	public void buildNgrams() throws Exception {
 		String receiver = "";
 		String word = "";
 		String sql;
 
 		// ngramDao.fillEmptyNgram();
-		String contents = readFileAsString("A Maze Of Death v1.0.txt");
+		String contents = readFileAsString("text.txt");
 		contents = preproc(contents);
 		LinkedList<String[]> l = new LinkedList<String[]>();
 		String[] a1 = ngrams(contents, 2);
@@ -45,7 +47,7 @@ public class Ngrams {
 		int n = 1;
 
 		for (String[] words : l) {
-			fillTable(words);
+			fillTable(words, n);
 			n++;
 		}
 	}
@@ -57,9 +59,9 @@ public class Ngrams {
 		// int index = s.indexOf("  ");
 		// while(index != -1)
 		// {
-		s = s.replaceAll(".", ". ");
+		s = s.replaceAll("'.'", ". ");
 		s = s.replaceAll(",", ", ");
-		s = s.replaceAll("?", "? ");
+		s = s.replaceAll("'?'", "? ");
 		s = s.replaceAll(";", "; ");
 		s = s.replaceAll("!", "! ");
 		s = s.replaceAll("\\s\\s+", " ");
@@ -69,11 +71,10 @@ public class Ngrams {
 		return s;
 	}
 
-	public void fillTable(String[] words) throws Exception {
+	public void fillTable(String[] words, int tableN) throws Exception {
 		String word;
 		String receiver = "";
-		int count = 0;
-		count++;
+
 		// receiver = cleanWords(new String[]{receiver})[0];
 		NgramsDAO ngramDao = NgramsDAO.getInstance();
 		// ngramDao.insertDbLine(1, "", "", 0, "");
@@ -83,14 +84,14 @@ public class Ngrams {
 				String pattern = words[n].substring(0, words[n].length() - 1
 						- patterns[patterns.length - 1].length());
 
-				System.out.println(words[n] + " the pattern :" + pattern
-						+ " the word : " + patterns[patterns.length - 1]);
+//				System.out.println("sentence:: " +words[n] + "  pattern:" + pattern
+//						+ "--word:" + patterns[patterns.length - 1]);
 				String[] strWOapostrophes = NgramsDAO.cleanWords(new String[] {
 						pattern, patterns[patterns.length - 1] });
 				pattern = strWOapostrophes[0];
 				word = strWOapostrophes[1];
 				try {
-					ngramDao.getNgrams(pattern, word, receiver, count);
+					ngramDao.getNgrams(pattern, word, receiver, tableN);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

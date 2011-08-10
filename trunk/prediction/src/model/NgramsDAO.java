@@ -1,11 +1,20 @@
 package model;
 
+import java.util.LinkedList;
+
+import ngrams.Ngrams;
+
 import controller.Main;
 
 public class NgramsDAO {
 
 	static private NgramsDAO instance = null;
 	private static JDBCWrapper connection = null;
+	public static void main(String[] args) throws Exception{
+		ngrams.Ngrams ngrams = new Ngrams();
+		NgramsDAO.getInstance().clearNgrams();
+		ngrams.buildNgrams();
+	}
 
 	/**
 	 * Constructor
@@ -50,10 +59,24 @@ public class NgramsDAO {
 			clearNgrams(i);
 	}
 
+	public void test() throws Exception{
+		String sql = "SELECT * FROM NGRAM_1";
+		NgramVO ngram = null;
+		connection.executeQuery(sql);
+		while (connection.next()){
+			ngram = NgramVO.getNgramDb(connection);
+			System.err.println("id::"+ ngram.getId());
+			if(connection.getRowsNumber() > 0){
+				ngram = NgramVO.getNgramDb(connection);
+				System.err.println("id::"+ ngram.getId());
+			}
+		}
+		Main.closeDb();
+	}
 	public void clearNgrams(int n) throws Exception {
 		String sql = "";
 		sql = "DELETE FROM NGRAM_" + n;
-		connection.dmlExecute(sql);
+		connection.execute(sql);
 	}
 
 	public void insertDbLine(int n, String pattern, String word, int frequency,
@@ -62,28 +85,44 @@ public class NgramsDAO {
 				+ " (PATTERN, WORD, FREQUENCY, RECEIVER) VALUES ('" + pattern
 				+ "' ," + "'" + word + "', " + frequency + ", '" + receiver
 				+ "' )";
-		connection.dmlExecute(sql);
+		connection.execute(sql);
 	}
 
-	private void checkDbLine(int n, String pattern, String word, int frequency,
+	private boolean selectPatternAndWords(int n, String pattern, String word,
 			String receiver) throws Exception {
 		String sql = " SELECT * FROM NGRAM_" + n + " WHERE PATTERN ='"
 				+ pattern + "'" + " AND WORD ='" + word + "'";
-		connection.execute(sql);
+		connection.executeQuery(sql);
+		return connection.getRowsNumber() > 0;
 	}
+	public LinkedList<String> getByPattern(int n, String pattern) throws Exception {
+		String sql = " SELECT * FROM NGRAM_" + n + " WHERE PATTERN ='"
+				+ pattern + "'";
+		connection.executeQuery(sql);
+		NgramVO ngram =null;
+		LinkedList<String> list = new LinkedList<String>();
+		if(connection.getRowsNumber() > 0){
+			while(connection.next()){
+				ngram = NgramVO.getNgramDb(connection);
+				list.add(ngram.getWord());
+			}
+			return list;
+		}
+		return null;
+	}
+	
+	
 
 	private void updateDbFrequency(int n, int frequency, int id) throws Exception {
 		String sql = " UPDATE NGRAM_" + n + " SET FREQUENCY=" + (frequency) + " WHERE ID ="
 				+ id;
-		connection.dmlExecute(sql);
+		connection.execute(sql);
 	}
 
 	public void getNgrams(String pattern, String word, String receiver, int n)
 			throws Exception {
 		NgramVO ngram = new NgramVO();
-		int frequency = 0;
-		checkDbLine(n, pattern, word, frequency, receiver);
-		if(connection.getRowsNumber() > 0){
+		if(selectPatternAndWords(n, pattern, word, receiver)){
 			ngram = NgramVO.getNgramDb(connection);
 			if (!ngram.getPattern().equals(pattern) || !ngram.getWord().equals(word)
 					|| !ngram.getReceiver().equals(receiver)) {

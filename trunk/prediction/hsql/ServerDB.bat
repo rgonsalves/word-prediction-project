@@ -25,7 +25,7 @@ REM    -trace <true/false>   display JDBC trace messages
 REM    -no_system_exit <true/false>  do not issue System.exit()
 REM The command line arguments override the values in the server.properties file.
 REM
-@java -classpath "%CLASSPATH%;hsqldb.jar" -Xms256m -Xmx512m org.hsqldb.Server -database.0 file:words -dbname.0 database 
+@java -classpath "%CLASSPATH%;hsqldb.jar" -Xms256m -Xmx512m org.hsqldb.Server -trace true -port 9500 -database words
 
 REM Usage: java WebServer [-options]
 REM where options include:

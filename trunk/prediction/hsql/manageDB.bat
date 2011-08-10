@@ -15,6 +15,6 @@ REM See the License for the specific language governing permissions and
 REM limitations under the License.
 
 REM ***
-@java -classpath "%CLASSPATH%;hsqldb.jar" -Xms256m -Xmx512m org.hsqldb.util.DatabaseManager -url jdbc:hsqldb:hsql://localhost/database 
+@java -classpath "%CLASSPATH%;hsqldb.jar" org.hsqldb.util.DatabaseManager -url jdbc:hsqldb:hsql://localhost:9500
 
 REM -url jdbc:hsqldb:suadb
